@@ -72,7 +72,7 @@ class TileCollection {
         }
         allTiles = tilesGenerated.shuffle()
         let time = Int(NSDate().timeIntervalSinceReferenceDate)%12
-        for _ in 1...time {
+        for _ in 1..<time {
             allTiles = allTiles.shuffle()
         }
         
