@@ -1,8 +1,8 @@
 //
 //  GameViewController.swift
-//  Extreme WWF
+//  asdfasfaf
 //
-//  Created by Jonathan Lin on 1/30/16.
+//  Created by Jonathan Lin on 2/11/16.
 //  Copyright (c) 2016 Jon Lin. All rights reserved.
 //
 
@@ -11,10 +11,12 @@ import SpriteKit
 
 class GameViewController: UIViewController {
 
+    var scene:GameScene!
     override func viewDidLoad() {
         super.viewDidLoad()
 
         if let scene = GameScene(fileNamed:"GameScene") {
+            self.scene = scene
             // Configure the view.
             let skView = self.view as! SKView
             skView.showsFPS = true
@@ -25,13 +27,25 @@ class GameViewController: UIViewController {
             
             /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFill
-            
+
             skView.presentScene(scene)
+            
+            
+        }
+        else {
+            print("View did not load" )
         }
     }
+    
+    @IBAction func playMove(sender: UIBarButtonItem) {
+//        scene.switchPlayersTiles()
+    }
 
+    @IBAction func resetTiles(sender: UIBarButtonItem) {
+//        scene.resetTiles()
+    }
     override func shouldAutorotate() -> Bool {
-        return true
+        return false
     }
 
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
