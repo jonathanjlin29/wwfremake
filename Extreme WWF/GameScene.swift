@@ -237,6 +237,10 @@ class GameScene: SKScene {
     }
     
     
+    /**
+     
+     This draws a little black area for where the tiles can be placed.
+     */
     func drawTileRack(position : CGPoint, width : CGFloat, height : CGFloat) {
         let tileRack = SKShapeNode(rectOfSize: CGSize(width: width + scrabbleSquareWidth*1.5, height : height + 10))
         tileRack.name = "tilerack"
@@ -255,7 +259,7 @@ class GameScene: SKScene {
         let startY = CGRectGetMidY(self.frame) - (3 * scrabbleSquareHeight);
         let startX = CGRectGetMidX(self.frame) - (3.5 * scrabbleSquareWidth);
 
-
+        
         drawTileRack(CGPointMake(CGFloat(startX), CGFloat(startY)),
             width: 7 * scrabbleSquareWidth, height: scrabbleSquareHeight)
 
@@ -325,8 +329,10 @@ class GameScene: SKScene {
     //if we touch a player's tiles, then we want to store that tiles
     //original position in case we couldn't place it where it is suposed to be
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let previousPoint:CGPoint! = touches.first?.previousLocationInNode(self)
+        //this stores where the node was originally touched
+        let previousPoint:CGPoint! = touches.first?.locationInNode(self)
         let touchedNode = self.nodeAtPoint(previousPoint)
+        
         
         if player1Turn && player1Tiles.contains(touchedNode) {
             originalPosition = touchedNode.position
@@ -391,6 +397,16 @@ class GameScene: SKScene {
         return nil
     }
     
+    
+    func setSquareAsPlaying() {
+        
+    }
+    
+    
+    func fillSquareWithPlaying() {
+        
+    }
+    
     /*
     Friday Feb 26th,
     u = x- x0 / x1-x0 percenteage position
@@ -405,9 +421,11 @@ class GameScene: SKScene {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         if let curNode = curMovingNode {
+            //This allows us to drop the placement of the scrabble square
+            //whereever the center of the tile is,
+            //not the bottom left corner
             let xOffset = CGFloat(scrabbleSquareWidth) * 0.50
             let yOffset = CGFloat(scrabbleSquareHeight) * 0.50
-            
             //this is the position of the dragged tile
             var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x - xOffset, curNode.position.y + self.deltaPoint.y + yOffset)
 
@@ -419,9 +437,7 @@ class GameScene: SKScene {
             if curSquarePlacement != nil && !curSquarePlacement!.isFilled  {
                 newPoint.x = curSquarePlacement!.initX
                 newPoint.y = curSquarePlacement!.initY
-//                print("PlacementIsFilledBefore = \(curSquarePlacement!.isFilled)")
                 curSquarePlacement!.isFilled = true
-//                print("PlacementIsFilledAfter = \(curSquarePlacement!.isFilled)")
             }
             else {
                 newPoint = originalPosition!
@@ -478,7 +494,7 @@ class GameScene: SKScene {
         }
         
         
-//        player1Tiles[0].position = CGPointMake(CGRectGetMidX(self.frame) + CGFloat(40 * cos(NSDate().timeIntervalSince1970)), CGRectGetMidY(self.frame) + CGFloat(40 * sin(NSDate().timeIntervalSince1970)))
+        player1Tiles[0].position = CGPointMake(CGRectGetMidX(self.frame) + CGFloat(40 * cos(NSDate().timeIntervalSince1970)), CGRectGetMidY(self.frame) + CGFloat(40 * sin(NSDate().timeIntervalSince1970)))
         
 //        print("UPDATING")
     }
