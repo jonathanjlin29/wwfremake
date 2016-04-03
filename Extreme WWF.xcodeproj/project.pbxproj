@@ -14,6 +14,9 @@
 		205091771C5EDD4500FC18C0 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091761C5EDD4500FC18C0 /* Player.swift */; };
 		205091791C5EDE5300FC18C0 /* Scoreboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091781C5EDE5300FC18C0 /* Scoreboard.swift */; };
 		2050917B1C5EDF0900FC18C0 /* SpecialSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2050917A1C5EDF0900FC18C0 /* SpecialSquare.swift */; };
+		205BF41E1C9CC08400D63CAF /* GameBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205BF41D1C9CC08400D63CAF /* GameBoardView.swift */; };
+		205BF4201C9CC0DB00D63CAF /* TileRack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205BF41F1C9CC0DB00D63CAF /* TileRack.swift */; };
+		205BF4221C9CC3CC00D63CAF /* SquareState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205BF4211C9CC3CC00D63CAF /* SquareState.swift */; };
 		20608DEF1C5DCC6800E01D12 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */; };
 		20608DF31C5DCC6800E01D12 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DF21C5DCC6800E01D12 /* GameScene.swift */; };
 		20608DF81C5DCC6800E01D12 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20608DF61C5DCC6800E01D12 /* Main.storyboard */; };
@@ -28,7 +31,6 @@
 		20995FEA1C71333200D80292 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20995FE91C71333200D80292 /* GameController.swift */; };
 		20B6F3C71C6530D2007A0E72 /* TileCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B6F3C61C6530D2007A0E72 /* TileCollection.swift */; };
 		20B6F3CB1C653B04007A0E72 /* TileDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B6F3CA1C653B04007A0E72 /* TileDictionary.swift */; };
-		20E151C81C6D97D400C2AE27 /* scrabble_square1.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 20E151C71C6D97D400C2AE27 /* scrabble_square1.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,9 @@
 		205091761C5EDD4500FC18C0 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		205091781C5EDE5300FC18C0 /* Scoreboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scoreboard.swift; sourceTree = "<group>"; };
 		2050917A1C5EDF0900FC18C0 /* SpecialSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpecialSquare.swift; sourceTree = "<group>"; };
+		205BF41D1C9CC08400D63CAF /* GameBoardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameBoardView.swift; sourceTree = "<group>"; };
+		205BF41F1C9CC0DB00D63CAF /* TileRack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileRack.swift; sourceTree = "<group>"; };
+		205BF4211C9CC3CC00D63CAF /* SquareState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquareState.swift; sourceTree = "<group>"; };
 		20608DEB1C5DCC6800E01D12 /* Extreme WWF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Extreme WWF.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		20608DF21C5DCC6800E01D12 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -67,7 +72,6 @@
 		20995FE91C71333200D80292 /* GameController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
 		20B6F3C61C6530D2007A0E72 /* TileCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileCollection.swift; sourceTree = "<group>"; };
 		20B6F3CA1C653B04007A0E72 /* TileDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileDictionary.swift; sourceTree = "<group>"; };
-		20E151C71C6D97D400C2AE27 /* scrabble_square1.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = scrabble_square1.jpeg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +95,11 @@
 		20402E731C9BB145007CE199 /* view */ = {
 			isa = PBXGroup;
 			children = (
+				204D14A01C92772800903B37 /* SquarePlacement.swift */,
+				208210891C6D7AA6009FB972 /* GameViewController.swift */,
+				20608DF21C5DCC6800E01D12 /* GameScene.swift */,
+				205BF41D1C9CC08400D63CAF /* GameBoardView.swift */,
+				205BF41F1C9CC0DB00D63CAF /* TileRack.swift */,
 			);
 			name = view;
 			sourceTree = "<group>";
@@ -116,18 +125,14 @@
 		20608DED1C5DCC6800E01D12 /* Extreme WWF */ = {
 			isa = PBXGroup;
 			children = (
-				20E151C71C6D97D400C2AE27 /* scrabble_square1.jpeg */,
 				20608E121C5DD24800E01D12 /* MVC */,
 				20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */,
 				20402E731C9BB145007CE199 /* view */,
 				2082108B1C6D7AFD009FB972 /* GameScene.sks */,
-				20608DF21C5DCC6800E01D12 /* GameScene.swift */,
 				20608DF61C5DCC6800E01D12 /* Main.storyboard */,
-				208210891C6D7AA6009FB972 /* GameViewController.swift */,
 				20608DF91C5DCC6800E01D12 /* Assets.xcassets */,
 				20608DFB1C5DCC6800E01D12 /* LaunchScreen.storyboard */,
 				20608DFE1C5DCC6800E01D12 /* Info.plist */,
-				204D14A01C92772800903B37 /* SquarePlacement.swift */,
 			);
 			path = "Extreme WWF";
 			sourceTree = "<group>";
@@ -154,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */,
+				205BF4211C9CC3CC00D63CAF /* SquareState.swift */,
 				205091721C5EDCB900FC18C0 /* GameState.swift */,
 				20608E131C5DD27800E01D12 /* GameboardModel.swift */,
 				20608E181C5EBAEB00E01D12 /* NormalSquare.swift */,
@@ -261,7 +267,6 @@
 			files = (
 				2082108C1C6D7AFD009FB972 /* GameScene.sks in Resources */,
 				20608DFD1C5DCC6800E01D12 /* LaunchScreen.storyboard in Resources */,
-				20E151C81C6D97D400C2AE27 /* scrabble_square1.jpeg in Resources */,
 				20608DFA1C5DCC6800E01D12 /* Assets.xcassets in Resources */,
 				20608DF81C5DCC6800E01D12 /* Main.storyboard in Resources */,
 			);
@@ -286,12 +291,15 @@
 				20608DF31C5DCC6800E01D12 /* GameScene.swift in Sources */,
 				20608E191C5EBAEB00E01D12 /* NormalSquare.swift in Sources */,
 				20608E171C5DD35500E01D12 /* AbstractBoardSquare.swift in Sources */,
+				205BF41E1C9CC08400D63CAF /* GameBoardView.swift in Sources */,
 				2050917B1C5EDF0900FC18C0 /* SpecialSquare.swift in Sources */,
 				205091711C5EDB9300FC18C0 /* Tile.swift in Sources */,
 				205091731C5EDCB900FC18C0 /* GameState.swift in Sources */,
 				20B6F3CB1C653B04007A0E72 /* TileDictionary.swift in Sources */,
 				20608E141C5DD27800E01D12 /* GameboardModel.swift in Sources */,
 				204D14A11C92772800903B37 /* SquarePlacement.swift in Sources */,
+				205BF4221C9CC3CC00D63CAF /* SquareState.swift in Sources */,
+				205BF4201C9CC0DB00D63CAF /* TileRack.swift in Sources */,
 				2082108A1C6D7AA6009FB972 /* GameViewController.swift in Sources */,
 				20B6F3C71C6530D2007A0E72 /* TileCollection.swift in Sources */,
 				205091771C5EDD4500FC18C0 /* Player.swift in Sources */,

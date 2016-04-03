@@ -17,7 +17,6 @@ class GameScene: SKScene {
     
 
     
-    var textLabel:UILabel?
     /**
      This returns true if it is player1's turn.
      */
@@ -106,13 +105,15 @@ class GameScene: SKScene {
      These are the dimensions we use for the board squares and
      the player's tiles.
      */
-    lazy var scrabbleSquareWidth:CGFloat = CGFloat(SKTexture(imageNamed: "empty_scrabble_square").size().width * self.scale)
+//    lazy var scrabbleSquareWidth:CGFloat = CGFloat(SKTexture(imageNamed: "empty_scrabble_square").size().width * self.scale)
     lazy var scrabbleSquareHeight: CGFloat  = CGFloat(SKTexture(imageNamed: "empty_scrabble_square").size().height * self.scale)
-    
-    /**
-     This is the player's tile spacing.
-     */
-    let playerTileSpacing = 30
+
+    lazy var scrabbleSquareWidth:CGFloat = CGRectGetMaxX(self.frame) / 15.0
+
+//    /**
+//     This is the player's tile spacing.
+//     */
+//    let playerTileSpacing = 30
     
     
     /**
@@ -153,11 +154,12 @@ class GameScene: SKScene {
 //     */
     func drawBoardSquare(column: Int, row: Int, board0thIndexOfX : CGFloat, board0thIndexOfY : CGFloat) {
         let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
+        
         let square = SKSpriteNode(texture: squareTexture)
+        square.size.width = scrabbleSquareWidth
+        square.size.height = scrabbleSquareWidth
         square.name = String(column) + String(row) +  "square"
         
-        square.yScale = scale
-        square.xScale = scale
         //calculates the spacing
         let absPosX = CGFloat(column) * scrabbleSquareWidth
         let absPosY = CGFloat(row) * scrabbleSquareWidth
@@ -169,8 +171,7 @@ class GameScene: SKScene {
         
         gameboardSquares.append(square)
         
-        addCoordinates(row, colIndex: column, xPosition: xPosition, yPosition: yPosition, xLength: scrabbleSquareWidth, yLength: scrabbleSquareHeight)
-//        print(square.position)
+        addCoordinates(row, colIndex: column, xPosition: xPosition, yPosition: yPosition, xLength: scrabbleSquareWidth, yLength: scrabbleSquareWidth)
     }
 
     /**
@@ -190,34 +191,37 @@ class GameScene: SKScene {
      This will return the pixel location of the end position of the board on the X axis.
      */
     func endX() -> CGFloat {
-        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
-        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
-        let absPosX = CGFloat(gameboardSize) * spacing
-        return (startX() + absPosX)
+//        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
+//        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
+//        let absPosX = CGFloat(gameboardSize) * spacing
+        let maxX = CGRectGetMaxX(self.frame)
+        return maxX
+//        return (startX() + absPosX)
     }
     
     /**
      This will return the pixel location of the end position of the board on the Y axis.
      */
     func endY() -> CGFloat {
-        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
-        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
-        let absPosY = CGFloat(gameboardSize) * spacing
-        return (startY() - absPosY)
+//        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
+//        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
+        let absPosY = CGFloat(gameboardSize) * scrabbleSquareWidth
+        let maxY = startY() - absPosY
+        return maxY
     }
     
     /**
      This function returns the pixel location of the start position of the board on the X axis.
      */
     func startX () -> CGFloat {
-        return CGRectGetMinX(self.frame) + (CGFloat(gameboardModel.getSize()) * scrabbleSquareWidth)
+        return CGRectGetMinX(self.frame) //+ (CGFloat(gameboardModel.getSize()) * scrabbleSquareWidth)
     }
 //
 //    /**
 //     This function returns the pixel location of the start position of the board on the Y axis.
 //     */
     func startY () -> CGFloat {
-        return CGRectGetMaxY(self.frame) - CGFloat(60)
+        return CGRectGetMaxY(self.frame)// - CGFloat(60)
     }
 
     
@@ -242,14 +246,19 @@ class GameScene: SKScene {
      This draws a little black area for where the tiles can be placed.
      */
     func drawTileRack(position : CGPoint, width : CGFloat, height : CGFloat) {
-        let tileRack = SKShapeNode(rectOfSize: CGSize(width: width + scrabbleSquareWidth*1.5, height : height + 10))
+        let tileRack = SKShapeNode(rectOfSize: CGSize(width: CGRectGetMaxX(self.frame),
+            height : height))
         tileRack.name = "tilerack"
-        tileRack.fillColor = SKColor.blackColor()
 
-        let newPos = CGPointMake(position.x + width/2.0, position.y)
+        tileRack.fillColor = SKColor.blackColor()
+        
+        let newPos = CGPointMake(CGRectGetMidX(self.frame), height/2 + 44)
         tileRack.position = newPos
         tileRack.zPosition = 0
         self.addChild(tileRack)
+        
+//        for _ in 1...7 {
+//        }
     }
     
     /**
@@ -261,7 +270,7 @@ class GameScene: SKScene {
 
         
         drawTileRack(CGPointMake(CGFloat(startX), CGFloat(startY)),
-            width: 7 * scrabbleSquareWidth, height: scrabbleSquareHeight)
+            width: 7 * scrabbleSquareWidth, height: scrabbleSquareHeight * 3.0)
 
         //Player 1's Tiles
         for i in 1...7 {
@@ -308,8 +317,8 @@ class GameScene: SKScene {
      Whoever is the player, it toggles the view of their player's tiles.
      */
     func togglePlayerTiles (playersTiles: Array<SKNode>) {
+        //TODO: This will have to make sure the tiles that are placed stay visible on the board.
         for each in playersTiles {
-            
             each.hidden = !each.hidden
         }
     }
@@ -321,49 +330,10 @@ class GameScene: SKScene {
         togglePlayerTiles(player1Tiles)
         togglePlayerTiles(player2Tiles)
         player1Turn = !player1Turn
-        
     }
     
     
-    
-    //if we touch a player's tiles, then we want to store that tiles
-    //original position in case we couldn't place it where it is suposed to be
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        //this stores where the node was originally touched
-        let previousPoint:CGPoint! = touches.first?.locationInNode(self)
-        let touchedNode = self.nodeAtPoint(previousPoint)
-        
-        
-        if player1Turn && player1Tiles.contains(touchedNode) {
-            originalPosition = touchedNode.position
-        }
-        else if !player1Turn && player2Tiles.contains(touchedNode) {
-            originalPosition = touchedNode.position
-        }
-        
-    }
-    
-    /**
-        This function gets called anytime a touch moves.
-     */
-    override func touchesMoved(touches: Set<UITouch>,withEvent event: UIEvent?) {
-        let currentPoint:CGPoint! = touches.first?.locationInNode(self)
-        let previousPoint:CGPoint! = touches.first?.previousLocationInNode(self)
-        
-        let touchedNode = self.nodeAtPoint(previousPoint)
-        
-        if player1Tiles.contains(touchedNode) || player2Tiles.contains(touchedNode) {
-            curMovingNode = touchedNode
-            curMovingNode?.zPosition = 2
-            deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
-        }
-        else {
-            curMovingNode = nil
-            deltaPoint = CGPointZero
-        }
-        
-        
-    }
+
     
     
     /**
@@ -403,7 +373,53 @@ class GameScene: SKScene {
     }
     
     
-    func fillSquareWithPlaying() {
+    /**
+        This function updates the model to 
+        represent the view.
+     */
+    func placeTileOntoBoard(row : Int, col : Int, letter : Character) {
+        //I want to store the SKNode's Index and Row with the tile.
+        gameboardModel.placeLetter(row, col: col, letter: letter)
+        
+    }
+    //if we touch a player's tiles, then we want to store that tiles
+    //original position in case we couldn't place it where it is suposed to be
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        //this stores where the node was originally touched
+        let previousPoint:CGPoint! = touches.first?.locationInNode(self)
+        let touchedNode = self.nodeAtPoint(previousPoint)
+        
+        //Will have to change this to multiple players
+        if player1Turn && player1Tiles.contains(touchedNode) {
+            originalPosition = touchedNode.position
+            touchedNode.zPosition = CGFloat(2)
+        }
+        else if !player1Turn && player2Tiles.contains(touchedNode) {
+            originalPosition = touchedNode.position
+            touchedNode.zPosition = CGFloat(2)
+        }
+        
+    }
+    
+    /**
+     This function gets called anytime a touch moves.
+     */
+    override func touchesMoved(touches: Set<UITouch>,withEvent event: UIEvent?) {
+        let currentPoint:CGPoint! = touches.first?.locationInNode(self)
+        let previousPoint:CGPoint! = touches.first?.previousLocationInNode(self)
+        
+        let touchedNode = self.nodeAtPoint(previousPoint)
+        
+        if player1Tiles.contains(touchedNode) || player2Tiles.contains(touchedNode) {
+            curMovingNode = touchedNode
+            curMovingNode?.zPosition = 2
+            deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
+        }
+        else {
+            curMovingNode = nil
+            deltaPoint = CGPointZero
+        }
+        
         
     }
     
@@ -429,15 +445,17 @@ class GameScene: SKScene {
             //this is the position of the dragged tile
             var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x - xOffset, curNode.position.y + self.deltaPoint.y + yOffset)
 
-
             //convert the xIndex and yIndex to a 1 dimensional array
             let curSquarePlacement = getSquarePlacement(newPoint)
             //and then check if it is within the squarePlacements
             
-            if curSquarePlacement != nil && !curSquarePlacement!.isFilled  {
+            //now we check where to place it.
+            if curSquarePlacement != nil && !curSquarePlacement!.isFilled()  {
                 newPoint.x = curSquarePlacement!.initX
                 newPoint.y = curSquarePlacement!.initY
-                curSquarePlacement!.isFilled = true
+                placeTileOntoBoard(curSquarePlacement!.rowIndex, col: curSquarePlacement!.colIndex, letter: curNode.name![0])
+                curSquarePlacement!.state = .Placed
+                
             }
             else {
                 newPoint = originalPosition!
@@ -450,7 +468,6 @@ class GameScene: SKScene {
             curMovingNode?.zPosition = 1
             curMovingNode = nil
             originalPosition = nil
-            print("THE NODE's CURRENT POSITION IS = " + String(curNode.position))
             
         }
         deltaPoint = CGPointZero
@@ -469,6 +486,7 @@ class GameScene: SKScene {
       If the touch is canceled, then you don't want to do anything.
      */
     override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+        print("touch cancelled")
         deltaPoint = CGPointZero
         curMovingNode?.position = originalPosition!
         originalPosition = nil
@@ -488,15 +506,15 @@ class GameScene: SKScene {
     /* Called before each frame is rendered */
     override func update(currentTime: CFTimeInterval) {
         if let curNode = curMovingNode {
+            print("cur node is moving")
             let newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x, curNode.position.y + self.deltaPoint.y)
             curNode.position = newPoint
             deltaPoint = CGPointZero
         }
         
         
-        player1Tiles[0].position = CGPointMake(CGRectGetMidX(self.frame) + CGFloat(40 * cos(NSDate().timeIntervalSince1970)), CGRectGetMidY(self.frame) + CGFloat(40 * sin(NSDate().timeIntervalSince1970)))
-        
-//        print("UPDATING")
+//        player1Tiles[0].position = CGPointMake(CGRectGetMidX(self.frame) + CGFloat(40 * cos(NSDate().timeIntervalSince1970)), CGRectGetMidY(self.frame) + CGFloat(40 * sin(NSDate().timeIntervalSince1970)))
+
     }
     
     

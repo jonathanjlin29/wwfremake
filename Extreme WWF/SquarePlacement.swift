@@ -26,9 +26,22 @@ class SquarePlacement {
     var endY:CGFloat
     var rowIndex:Int
     var colIndex:Int
-    var isFilled:Bool
     var state:SquareState
     
+    func setFilled(newState : SquareState) {
+        state = newState
+    }
+    func isFilled() -> Bool {
+        switch (state) {
+        case .Empty:
+            return false
+        case .Final:
+            return true
+        case .Placed:
+            return true
+            
+        }
+    }
     
     init(colNDX: Int, rowNDX: Int, initialX: CGFloat, endOfX: CGFloat, initialY: CGFloat, endOfY: CGFloat) {
         initX = initialX
@@ -38,6 +51,5 @@ class SquarePlacement {
         rowIndex = rowNDX
         colIndex = colNDX
         state = .Empty
-        isFilled = false
     }
 }

@@ -12,11 +12,21 @@ class AbstractBoardSquare {
     var value:Int
     var hasLetter:Bool
     var letterOnSpace:Tile?
+    var state:SquareState
     
     init() {
         self.value = 0
         self.hasLetter = false
         self.letterOnSpace = nil
+        self.state = SquareState.Empty
+    }
+    
+    func getState() -> SquareState {
+        return state
+    }
+    
+    func setState(newState: SquareState) {
+        self.state = newState
     }
     
     func getValue() -> Int {
@@ -28,6 +38,13 @@ class AbstractBoardSquare {
     }
     
     func isFilled() -> Bool {
-        return hasLetter
+        switch (state) {
+        case .Empty:
+            return false
+        case .Final:
+            return true
+        case .Placed:
+            return true
+        }
     }
 }

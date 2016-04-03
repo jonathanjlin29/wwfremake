@@ -22,25 +22,36 @@ class BoardTileIndices {
 
 class GameboardModel {
     //this is the NxN sized gameboard
-    var gameboard = Array<Array<AbstractBoardSquare>>()
+    var gameboard:[[AbstractBoardSquare]]
     //this is the size of the gameboard
     var numRowsOrCols: Int
     
-    //This initializes the board to
-    //to all normal squares. We 
-    //can then use a JSON object
-    //to signify where the special square are
+    
     init(GameboardSize: Int) {
+        self.gameboard = [[AbstractBoardSquare]]()
         self.numRowsOrCols = GameboardSize
         for _ in 1...GameboardSize {
-            gameboard.append(Array(count:GameboardSize, repeatedValue:NormalSquare()))
+             var newGameboard = [AbstractBoardSquare]()
+            for _ in 1...GameboardSize {
+                newGameboard.append(NormalSquare())
+            }
+            self.gameboard.append(newGameboard)
+        }
+        
+        for row in gameboard {
+            for col in row {
+                if(col.isFilled()) {
+                    print(col.isFilled())
+                }
+            }
         }
     }
     
-    func hasTile(row: Int, col: Int) -> Bool {
-        return gameboard[row][col].isFilled();
-    }
-    
+    /**
+     This takes in current row and current column that the
+     placed tile is on and will check the
+     current column if the spelling is correct.
+     */
     func checkVerticalWord(row : Int, col : Int) -> Bool {
         var wordAtMoment:String = ""
         var curRow = row
@@ -65,18 +76,20 @@ class GameboardModel {
         return isSpellingCorrect(wordAtMoment)
     }
 
+    /**
+        This takes in current row and current column that the
+        placed tile is on and will check the
+        current row if the spelling is correct.
+     */
     func checkHorizontalWord(row : Int, col : Int) -> Bool {
         var wordAtMoment:String = ""
         var curCol = col
         
-        while curCol >= 0 && gameboard[row][curCol].hasLetter {
+        while curCol >= 0 && gameboard[row][curCol].isFilled() {
             wordAtMoment = String(gameboard[row][curCol].getLetterOnSpace()?.getLetter()) + wordAtMoment
             curCol -= 1
-        }
-        curCol = row + 1
-        while curCol < numRowsOrCols && gameboard[row][curCol].hasLetter {
-            wordAtMoment += String(gameboard[row][curCol].getLetterOnSpace()?.getLetter())
-            curCol += 1
+            print ("Word at moment \(wordAtMoment)")
+
         }
         
         if wordAtMoment.characters.count == 1 {
@@ -86,34 +99,24 @@ class GameboardModel {
         return isSpellingCorrect(wordAtMoment)
     }
     
-    
-    
     /**
         The player places a letter ono the board, so this function
         return whether the words spelled are valid or not
      */
     func placeLetter(row: Int, col: Int, letter: Character) -> Bool {
-        print("Place Letter : ")
+        print("Place Letter \(letter): \(row),\(col)")
         gameboard[row][col].letterOnSpace = Tile(curLet: letter)
-        print("Letter on space : ")
-        gameboard[row][col].hasLetter = true
+        gameboard[row][col].setState(SquareState.Placed)
         
-        print("Vertical spelling")
+//        print("Vertical spelling")
         let verticalSpelling = checkVerticalWord(row, col: col)
-        print("Horizontal spelling")
         let horizontalSpelling = checkHorizontalWord(row, col: col)
+//        for )
         
-//        return horizontalSpelling
-        return verticalSpelling && horizontalSpelling
+        return horizontalSpelling
+//        return verticalSpelling && horizontalSpelling
         
         
-    }
-    /**
-        This takes in a list of pairs (which are indices)
-        and returns true if the moves are valid.
-     */
-    func checkMove (tilesPlaced: Array<BoardTileIndices>) -> Bool {
-        return false
     }
     
     func setupBoard() {
@@ -126,30 +129,11 @@ class GameboardModel {
     }
     
     func isSpellingCorrect(word : String) -> Bool {
-        
-//        let attemptedURL = NSURL(string: "http://www.merriam-webster.com/dictionary/" + word)
-//        var isValidSpelling = false
-//        if let url = attemptedURL {
-//            let task = NSURLSession.sharedSession().dataTaskWithURL(url) { (data, response, error) -> Void in
-//                
-//                if let urlContent = data {
-//                    let webContent = NSString(data: urlContent, encoding: NSUTF8StringEncoding)
-//                    if webContent?.lowercaseString.rangeOfString("<h1>") != nil {
-//                        print("SPELLING IS ALRIGHT")
-//                        isValidSpelling = true
-//                    }
-//                }
-//            }
-//            task.resume()
-//        }
-
-        
-//        return isValidSpelling
+//        print("Current word \(word)")
         let checker = UITextChecker()
         let range = NSMakeRange(0, word.characters.count)
         let misspelledRange = checker.rangeOfMisspelledWordInString(word, range: range, startingAt: 0, wrap: false, language: "en")
-        
-        return misspelledRange.location == NSNotFound
+        return misspelledRange.location != NSNotFound
     }
     
 }

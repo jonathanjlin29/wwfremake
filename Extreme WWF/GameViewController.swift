@@ -42,7 +42,7 @@ class GameViewController: UIViewController {
     }
 
     @IBAction func resetTiles(sender: UIBarButtonItem) {
-//        scene.resetTiles()
+        scene.resetTiles()
     }
     override func shouldAutorotate() -> Bool {
         return false

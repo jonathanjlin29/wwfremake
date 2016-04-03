@@ -14,5 +14,9 @@ import Foundation
 */
 class NormalSquare: AbstractBoardSquare {
 
+    override init() {
+        super.init()
+        self.state = .Empty
+    }
     
 }
