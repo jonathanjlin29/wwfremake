@@ -37,14 +37,6 @@ class GameboardModel {
             }
             self.gameboard.append(newGameboard)
         }
-        
-        for row in gameboard {
-            for col in row {
-                if(col.isFilled()) {
-                    print(col.isFilled())
-                }
-            }
-        }
     }
     
     /**

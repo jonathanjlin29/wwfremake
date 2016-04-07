@@ -9,13 +9,14 @@
 import SpriteKit
 import Foundation
 
-
+////Y = ROW, X = COL
 /**
  This class represents the game board screen at UI Level.
  */
 class GameScene: SKScene {
     
-
+    
+    let toolBarHeight:CGFloat = 44.0
     
     /**
      This returns true if it is player1's turn.
@@ -36,11 +37,12 @@ class GameScene: SKScene {
      This is the array of gameboard squares that
      a player can move his or her tiles onto.
      */
-    var gameboardSquares:Array<SKNode> = []
+    var gameboard:[[BoardSquareSpriteNode]] = [[BoardSquareSpriteNode]]()
+
     
     /**
      This is a data structure that allows us to store where the 
-     gameboard squares are.
+     gameboard squares are allowed to be.
      */
     var SquarePlacements:Array<SquarePlacement> = []
 
@@ -94,27 +96,44 @@ class GameScene: SKScene {
     /**
      This is set whenever a player's tile is clicked.
      */
-    var curMovingNode:SKNode?
+    var curMovingNode:TileSpriteNode?
     
     /**
      scale for the scrabble board size.
      */
-    let scale = CGFloat(0.2)
+//    let scale = CGFloat(0.2)
     
-    /**
-     These are the dimensions we use for the board squares and
-     the player's tiles.
-     */
-//    lazy var scrabbleSquareWidth:CGFloat = CGFloat(SKTexture(imageNamed: "empty_scrabble_square").size().width * self.scale)
-    lazy var scrabbleSquareHeight: CGFloat  = CGFloat(SKTexture(imageNamed: "empty_scrabble_square").size().height * self.scale)
-
-    lazy var scrabbleSquareWidth:CGFloat = CGRectGetMaxX(self.frame) / 15.0
 
 //    /**
 //     This is the player's tile spacing.
 //     */
 //    let playerTileSpacing = 30
     
+    
+    
+    /**
+     The board square size, this is also the size of the tiles when they are dropped onto the 
+     board.
+     */
+    func boardSquareWidth() -> CGFloat {
+        let bounds = UIScreen.mainScreen().bounds
+        return bounds.size.width/CGFloat(gameboardSize)
+    }
+    
+    func boardSquareSize() -> CGSize {
+        return CGSizeMake(boardSquareWidth(), boardSquareWidth())
+    }
+    
+    /**
+     When the tile is on the tile rack, this is the size it will display as.
+     */
+    func tileSquareWidth() -> CGFloat {
+        let bounds = UIScreen.mainScreen().bounds
+        return bounds.size.width/CGFloat(7)
+    }
+    func tileSquareSize() -> CGSize {
+        return CGSizeMake(tileSquareWidth(), tileSquareWidth())
+    }
     
     /**
      When this view gets presented, this function is called
@@ -126,6 +145,7 @@ class GameScene: SKScene {
         initDrawBoard()
         initPlayersTiles()
 //        initMessageForPlayer()
+        print("Scrabble square width \(boardSquareWidth())")
     }
     
     
@@ -144,7 +164,7 @@ class GameScene: SKScene {
 //     */
     func addCoordinates (rowIndex : Int, colIndex : Int, xPosition : CGFloat, yPosition : CGFloat,
         xLength : CGFloat, yLength : CGFloat) {
-            let square = SquarePlacement (colNDX : colIndex - 1, rowNDX : rowIndex - 1, initialX : xPosition,
+            let square = SquarePlacement (colNDX : colIndex, rowNDX : rowIndex, initialX : xPosition,
                 endOfX : xPosition + xLength, initialY : yPosition, endOfY : yPosition + yLength )
             SquarePlacements.append(square)
     }
@@ -152,38 +172,41 @@ class GameScene: SKScene {
 //    /**
 //     This is the logic for drawing one board square.
 //     */
-    func drawBoardSquare(column: Int, row: Int, board0thIndexOfX : CGFloat, board0thIndexOfY : CGFloat) {
+    func drawBoardSquare(column: Int, row: Int) -> BoardSquareSpriteNode {
         let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
         
-        let square = SKSpriteNode(texture: squareTexture)
-        square.size.width = scrabbleSquareWidth
-        square.size.height = scrabbleSquareWidth
-        square.name = String(column) + String(row) +  "square"
+        let absPosX = CGFloat(column) * boardSquareWidth()
+        let absPosY = CGFloat(row) * boardSquareWidth()
+        let xPosition = startX() + absPosX
+        let yPosition = startY() - absPosY
+        let xLength = boardSquareWidth()
+        let yLength = boardSquareWidth()
         
-        //calculates the spacing
-        let absPosX = CGFloat(column) * scrabbleSquareWidth
-        let absPosY = CGFloat(row) * scrabbleSquareWidth
-        let xPosition = board0thIndexOfX + absPosX
-        let yPosition = board0thIndexOfY - absPosY
-        square.position = CGPoint(x: xPosition, y: yPosition)
+        let square = BoardSquareSpriteNode(texture: squareTexture,
+            rowNDX: row,
+            colNDX: column,
+            initialX: xPosition,
+            endOfX : xPosition + xLength,
+            initialY : yPosition,
+            endOfY : yPosition + yLength )
+        
+        square.size = boardSquareSize()
         square.zPosition = 0
         self.addChild(square)
         
-        gameboardSquares.append(square)
-        
-        addCoordinates(row, colIndex: column, xPosition: xPosition, yPosition: yPosition, xLength: scrabbleSquareWidth, yLength: scrabbleSquareWidth)
+        return square
     }
 
     /**
      This functions draws the initial empty board of board squares.
      */
     func initDrawBoard() {
-        //This draws the board from the
-        for yIndex in 1...15 {
-            //we want to go from left to right
-            for xIndex in 1...15 {
-                drawBoardSquare(xIndex, row: yIndex, board0thIndexOfX: startX(), board0thIndexOfY: startY())
+        for yIndex in 0..<gameboardSize {
+            var newGameboard = [BoardSquareSpriteNode]()
+            for xIndex in 0..<gameboardSize {
+                newGameboard.append(drawBoardSquare(xIndex, row: yIndex))
             }
+            self.gameboard.append(newGameboard)
         }
     }
 
@@ -191,9 +214,6 @@ class GameScene: SKScene {
      This will return the pixel location of the end position of the board on the X axis.
      */
     func endX() -> CGFloat {
-//        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
-//        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
-//        let absPosX = CGFloat(gameboardSize) * spacing
         let maxX = CGRectGetMaxX(self.frame)
         return maxX
 //        return (startX() + absPosX)
@@ -203,9 +223,7 @@ class GameScene: SKScene {
      This will return the pixel location of the end position of the board on the Y axis.
      */
     func endY() -> CGFloat {
-//        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
-//        let spacing = CGFloat(squareTexture.size().width) * CGFloat(scale)
-        let absPosY = CGFloat(gameboardSize) * scrabbleSquareWidth
+        let absPosY = CGFloat(gameboardSize) * boardSquareWidth()
         let maxY = startY() - absPosY
         return maxY
     }
@@ -214,25 +232,25 @@ class GameScene: SKScene {
      This function returns the pixel location of the start position of the board on the X axis.
      */
     func startX () -> CGFloat {
-        return CGRectGetMinX(self.frame) //+ (CGFloat(gameboardModel.getSize()) * scrabbleSquareWidth)
+        return CGRectGetMinX(self.frame) + boardSquareWidth()/2// + (CGFloat(gameboardModel.getSize()) * boardSquareWidth())
     }
 //
 //    /**
 //     This function returns the pixel location of the start position of the board on the Y axis.
 //     */
     func startY () -> CGFloat {
-        return CGRectGetMaxY(self.frame)// - CGFloat(60)
+        return CGRectGetMidY(self.frame) + (boardSquareWidth() * CGFloat(7.5))
     }
 
     
     /**
      This draws a player's tile at a specific spot.
      */
-    func drawPlayersTiles(letterToDraw : Character, placement: CGPoint) -> SKSpriteNode {
-        let square = tileBag.getSKNode(letterToDraw)
+    func drawPlayersTiles(letterToDraw : Character, placement: CGPoint) -> TileSpriteNode {
+        let square = tileBag.getTileNode(letterToDraw)
         square.color = UIColor.blackColor()
-        square.xScale = scale
-        square.yScale = scale
+        square.size.width = tileSquareWidth()
+        square.size.height = tileSquareWidth()
         square.position =  placement
         square.zPosition = 1
         self.addChild(square)
@@ -252,7 +270,8 @@ class GameScene: SKScene {
 
         tileRack.fillColor = SKColor.blackColor()
         
-        let newPos = CGPointMake(CGRectGetMidX(self.frame), height/2 + 44)
+        //We want to put the tile rack right above the tool bar
+        let newPos = CGPointMake(CGRectGetMidX(self.frame), height/2 + toolBarHeight)
         tileRack.position = newPos
         tileRack.zPosition = 0
         self.addChild(tileRack)
@@ -265,18 +284,18 @@ class GameScene: SKScene {
      This function initializes the game player's tiles for both player 1 and player 2.
      */
     func initPlayersTiles() {
-        let startY = CGRectGetMidY(self.frame) - (3 * scrabbleSquareHeight);
-        let startX = CGRectGetMidX(self.frame) - (3.5 * scrabbleSquareWidth);
+        let startY = CGRectGetMinY(self.frame) + 44 + tileSquareWidth()/2.0
+        let startX = CGRectGetMinX(self.frame) + tileSquareWidth()/2.0
 
         
         drawTileRack(CGPointMake(CGFloat(startX), CGFloat(startY)),
-            width: 7 * scrabbleSquareWidth, height: scrabbleSquareHeight * 3.0)
+            width: 7 * tileSquareWidth(), height: tileSquareWidth() * 1.5)
 
         //Player 1's Tiles
-        for i in 1...7 {
+        for i in 0...6 {
             if let poppedTile = tileBag.getnextTile() {
                 let letter = poppedTile.getLetter()
-                let position = CGPointMake(CGFloat(startX) + CGFloat(i) * scrabbleSquareWidth, CGFloat(startY))
+                let position = CGPointMake(CGFloat(startX) + CGFloat(i) * tileSquareWidth(), CGFloat(startY))
                 tileRack.append(position)
                 let square = drawPlayersTiles(letter, placement: position)
                 square.name = String(letter)
@@ -288,7 +307,7 @@ class GameScene: SKScene {
 
             if let poppedTile = tileBag.getnextTile() {
                 let letter = poppedTile.getLetter()
-                let square = drawPlayersTiles(letter, placement: CGPointMake(CGFloat(startX) + CGFloat(i) * scrabbleSquareWidth, CGFloat(startY)))
+                let square = drawPlayersTiles(letter, placement: CGPointMake(CGFloat(startX) + CGFloat(i) * boardSquareWidth(), CGFloat(startY)))
                 square.name = String(letter)
                 square.hidden = true
                 player2Tiles.append(square)
@@ -309,6 +328,8 @@ class GameScene: SKScene {
         let curPlayerTiles = player1Turn ? player1Tiles : player2Tiles
         for (ndx, each) in curPlayerTiles.enumerate() {
             each.position = tilePlacements[ndx]
+            let sks = each as! TileSpriteNode
+            sks.size = tileSquareSize()
         }
     }
 //
@@ -340,65 +361,67 @@ class GameScene: SKScene {
      This will return the xIndex of the board given a point on the board.
      */
     func getXIndex(curPoint : CGPoint) -> Int {
-        let xIndex = floor( ((curPoint.x - startX()) / (endX() - startX())) * CGFloat(gameboardSize))
-        return Int(xIndex)
+        var xIndex = Int(floor( ((curPoint.x - startX()) / (endX() - startX())) * CGFloat(gameboardSize)))
+        
+        if xIndex < 0 {
+            xIndex = 0
+        }
+        if xIndex >= gameboardSize {
+            xIndex = gameboardSize - 1
+        }
+        
+        return xIndex
     }
     
     /**
      This will return the yIndex of the board given a point on the board.
      */
     func getYIndex(curPoint : CGPoint) -> Int {
-        let yIndex = floor(((curPoint.y - startY()) / (endY() - startY())) * CGFloat(gameboardSize))
-        return Int(yIndex)
+        var yIndex = Int(floor(((curPoint.y - startY()) / (endY() - startY())) * CGFloat(gameboardSize)))
+        
+        if yIndex < 0 {
+            yIndex = 0
+        }
+        if yIndex >= gameboardSize {
+            yIndex = gameboardSize - 1
+        }
+        
+        return yIndex
     }
     
     
-    func getSquarePlacement (curPoint : CGPoint) -> SquarePlacement? {
+
+    func getBoardSquare (curPoint : CGPoint) -> BoardSquareSpriteNode? {
         //we check the xIndex and yIndex, and see if the position is on the scrabble board
         let xIndex = getXIndex(curPoint)
         let yIndex = getYIndex(curPoint)
-
-        let oneDimensionalIndex = findIndex(yIndex, col : xIndex)
         
-        if oneDimensionalIndex < SquarePlacements.count && oneDimensionalIndex >= 0 {
-            return SquarePlacements[oneDimensionalIndex]
+        if xIndex >= 0 && yIndex >= 0 && xIndex < gameboardSize && yIndex < gameboardSize {
+            return gameboard[yIndex][xIndex]
         }
         
         return nil
     }
     
     
-    func setSquareAsPlaying() {
-        
-    }
-    
-    
-    /**
-        This function updates the model to 
-        represent the view.
-     */
-    func placeTileOntoBoard(row : Int, col : Int, letter : Character) {
-        //I want to store the SKNode's Index and Row with the tile.
-        gameboardModel.placeLetter(row, col: col, letter: letter)
-        
-    }
     //if we touch a player's tiles, then we want to store that tiles
     //original position in case we couldn't place it where it is suposed to be
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         //this stores where the node was originally touched
         let previousPoint:CGPoint! = touches.first?.locationInNode(self)
-        let touchedNode = self.nodeAtPoint(previousPoint)
+        let touchedNode = self.nodeAtPoint(previousPoint) as? SKSpriteNode
         
         //Will have to change this to multiple players
-        if player1Turn && player1Tiles.contains(touchedNode) {
-            originalPosition = touchedNode.position
-            touchedNode.zPosition = CGFloat(2)
+        if touchedNode != nil {
+            if player1Turn && player1Tiles.contains(touchedNode!) {
+                originalPosition = touchedNode!.position
+                touchedNode!.zPosition = CGFloat(2)
+            }
+            else if !player1Turn && player2Tiles.contains(touchedNode!) {
+                originalPosition = touchedNode!.position
+                touchedNode!.zPosition = CGFloat(2)
+            }
         }
-        else if !player1Turn && player2Tiles.contains(touchedNode) {
-            originalPosition = touchedNode.position
-            touchedNode.zPosition = CGFloat(2)
-        }
-        
     }
     
     /**
@@ -411,7 +434,7 @@ class GameScene: SKScene {
         let touchedNode = self.nodeAtPoint(previousPoint)
         
         if player1Tiles.contains(touchedNode) || player2Tiles.contains(touchedNode) {
-            curMovingNode = touchedNode
+            curMovingNode = touchedNode as? TileSpriteNode
             curMovingNode?.zPosition = 2
             deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
         }
@@ -423,46 +446,65 @@ class GameScene: SKScene {
         
     }
     
+
+    func placeTileOntoBoard(curBoardSquare : BoardSquareSpriteNode?, tileNode: TileSpriteNode) {
+        curBoardSquare!.setFilled(.Placed)
+        tileNode.size = boardSquareSize()
+        tileNode.setPosition(curBoardSquare!.rowIndex, col: curBoardSquare!.colIndex)
+    }
+    
+    /**
+     Since the tiles have rowIndex, colIndex, we want to check that rowIndex and
+     colIndex, and then set that one to the state it is.
+     */
+    func setBoardToMatchTile(boardSquare : BoardSquareSpriteNode, tileNode : TileSpriteNode, state : BoardSquareSpriteNode.SquareState){
+        if let row = tileNode.getRow() {
+            if let col = tileNode.getCol() {
+                gameboard[row][col].state = state
+                print("row = \(row), col = \(col) is now \(state)")
+            }
+        }
+    }
+
     /*
     Friday Feb 26th,
-    u = x- x0 / x1-x0 percenteage position
-    v = y - y0/ y1 - y0
-    floor( u * numberofcols)
-    floor( u * numberofcols)
-    Given a 2D array, return index of single array
-    and same array
     TODO: Make sure you can spell multiple worlds, and validate them. Do this in backend, and
     tie in the front-end to that backend.
     */
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         if let curNode = curMovingNode {
-            //This allows us to drop the placement of the scrabble square
-            //whereever the center of the tile is,
-            //not the bottom left corner
-            let xOffset = CGFloat(scrabbleSquareWidth) * 0.50
-            let yOffset = CGFloat(scrabbleSquareHeight) * 0.50
+            //whereever the center of the tile is, not the bottom left corner
+            let xOffset = CGFloat(boardSquareWidth()) * 0.50
+            let yOffset = CGFloat(boardSquareWidth()) * 0.50
+            
             //this is the position of the dragged tile
-            var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x - xOffset, curNode.position.y + self.deltaPoint.y + yOffset)
+            var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x + xOffset, curNode.position.y + self.deltaPoint.y - yOffset)
 
             //convert the xIndex and yIndex to a 1 dimensional array
-            let curSquarePlacement = getSquarePlacement(newPoint)
+            let curBoardSquare = getBoardSquare(newPoint)
             //and then check if it is within the squarePlacements
             
-            //now we check where to place it.
-            if curSquarePlacement != nil && !curSquarePlacement!.isFilled()  {
-                newPoint.x = curSquarePlacement!.initX
-                newPoint.y = curSquarePlacement!.initY
-                placeTileOntoBoard(curSquarePlacement!.rowIndex, col: curSquarePlacement!.colIndex, letter: curNode.name![0])
-                curSquarePlacement!.state = .Placed
+            if curBoardSquare != nil {
+                //before we check if that space is filled,
+                //we want to reset the previous board position
                 
+                if !(curBoardSquare!.isFilled()) {
+                    newPoint.x = curBoardSquare!.initX
+                    newPoint.y = curBoardSquare!.initY
+                    setBoardToMatchTile(curBoardSquare!, tileNode: curNode, state: .Empty)
+                    placeTileOntoBoard(curBoardSquare, tileNode: curNode)
+                    print("col = \(curBoardSquare!.colIndex), row = \(curBoardSquare!.rowIndex) ")
+                }
+                else {
+                    setBoardToMatchTile(curBoardSquare!, tileNode: curNode, state: .Placed)
+                    newPoint = originalPosition!
+                    print("cannot be placed there")
+                }
             }
-            else {
-                newPoint = originalPosition!
-                print("cannot be placed there")
-            }
-            
+        
             //resetting the state
+
             curNode.position = newPoint
             deltaPoint = CGPointZero
             curMovingNode?.zPosition = 1
@@ -506,14 +548,10 @@ class GameScene: SKScene {
     /* Called before each frame is rendered */
     override func update(currentTime: CFTimeInterval) {
         if let curNode = curMovingNode {
-            print("cur node is moving")
             let newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x, curNode.position.y + self.deltaPoint.y)
             curNode.position = newPoint
             deltaPoint = CGPointZero
         }
-        
-        
-//        player1Tiles[0].position = CGPointMake(CGRectGetMidX(self.frame) + CGFloat(40 * cos(NSDate().timeIntervalSince1970)), CGRectGetMidY(self.frame) + CGFloat(40 * sin(NSDate().timeIntervalSince1970)))
 
     }
     
