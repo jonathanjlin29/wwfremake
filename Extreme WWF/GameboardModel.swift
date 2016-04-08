@@ -108,7 +108,6 @@ class GameboardModel {
         return horizontalSpelling
 //        return verticalSpelling && horizontalSpelling
         
-        
     }
     
     func setupBoard() {

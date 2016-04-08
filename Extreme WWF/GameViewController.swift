@@ -37,7 +37,7 @@ class GameViewController: UIViewController {
     }
     
     @IBAction func playMove(sender: UIBarButtonItem) {
-//        scene.switchPlayersTiles()
+        scene.playMove()
     }
 
     @IBAction func resetTiles(sender: UIBarButtonItem) {

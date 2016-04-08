@@ -19,6 +19,7 @@ class BoardSquareSpriteNode:SKSpriteNode {
         case Placed
     }
     
+    var letter:Character?
     var initX:CGFloat
     var endX:CGFloat
     var initY:CGFloat
@@ -41,14 +42,22 @@ class BoardSquareSpriteNode:SKSpriteNode {
 
     }
     
+    func setLetter(char : Character) {
+        self.letter = char
+    }
+    
+    func getLetter() -> Character? {
+        return self.letter
+    }
+    
     func setFilled(newState : SquareState) {
         state = newState
     }
     
     func isFilled() -> Bool {
-       return (self.state == .Final || self.state == .Placed) ? true : false
+       return (self.state == .Final || self.state == .Placed)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         initX = 0
         initY = 0

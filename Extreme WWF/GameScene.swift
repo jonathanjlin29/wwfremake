@@ -38,14 +38,6 @@ class GameScene: SKScene {
      a player can move his or her tiles onto.
      */
     var gameboard:[[BoardSquareSpriteNode]] = [[BoardSquareSpriteNode]]()
-
-    
-    /**
-     This is a data structure that allows us to store where the 
-     gameboard squares are allowed to be.
-     */
-    var SquarePlacements:Array<SquarePlacement> = []
-
     
     /**
      This stores where the tile rack is so the player can put them back 
@@ -61,7 +53,7 @@ class GameScene: SKScene {
     
 
     /**
-     This is the gameboard size
+     This is the gameboard size.
      */
     var gameboardSize =  15
     
@@ -79,7 +71,7 @@ class GameScene: SKScene {
     /**
      This is the tile rack that your tiles will "Sit on"
      */
-    var tileRack:Array<CGPoint> = []
+    var tileRack:Array<BoardSquareSpriteNode> = []
     
     /**
      This is used for the dragging of a player's tiles.
@@ -97,18 +89,6 @@ class GameScene: SKScene {
      This is set whenever a player's tile is clicked.
      */
     var curMovingNode:TileSpriteNode?
-    
-    /**
-     scale for the scrabble board size.
-     */
-//    let scale = CGFloat(0.2)
-    
-
-//    /**
-//     This is the player's tile spacing.
-//     */
-//    let playerTileSpacing = 30
-    
     
     
     /**
@@ -144,21 +124,11 @@ class GameScene: SKScene {
         tileBag.resetWithNewTiles()
         initDrawBoard()
         initPlayersTiles()
-//        initMessageForPlayer()
         print("Scrabble square width \(boardSquareWidth())")
     }
     
     
-//    /**
-//     This function will notify the user of their spelled word.
-//     */
-//    func initMessageForPlayer() {
-//        let position = CGRectMake( self.frame.minX, self.frame.minY, CGFloat(200), CGFloat(60))
-//        textLabel = UILabel(frame: position)
-//        textLabel?.text = "Hello"
-//        self.view?.addSubview(textLabel!)
-//    }
-//    
+
 //    /**
 //     This function adds the coordinates of all the squares into an array.
 //     */
@@ -166,7 +136,6 @@ class GameScene: SKScene {
         xLength : CGFloat, yLength : CGFloat) {
             let square = SquarePlacement (colNDX : colIndex, rowNDX : rowIndex, initialX : xPosition,
                 endOfX : xPosition + xLength, initialY : yPosition, endOfY : yPosition + yLength )
-            SquarePlacements.append(square)
     }
 //
 //    /**
@@ -216,9 +185,9 @@ class GameScene: SKScene {
     func endX() -> CGFloat {
         let maxX = CGRectGetMaxX(self.frame)
         return maxX
-//        return (startX() + absPosX)
     }
     
+
     /**
      This will return the pixel location of the end position of the board on the Y axis.
      */
@@ -260,7 +229,6 @@ class GameScene: SKScene {
     
     
     /**
-     
      This draws a little black area for where the tiles can be placed.
      */
     func drawTileRack(position : CGPoint, width : CGFloat, height : CGFloat) {
@@ -276,8 +244,13 @@ class GameScene: SKScene {
         tileRack.zPosition = 0
         self.addChild(tileRack)
         
-//        for _ in 1...7 {
-//        }
+    }
+    
+    /**
+      Generate the tile rack.
+     */
+    func generateTileRackPlacements() {
+        
     }
     
     /**
@@ -296,7 +269,6 @@ class GameScene: SKScene {
             if let poppedTile = tileBag.getnextTile() {
                 let letter = poppedTile.getLetter()
                 let position = CGPointMake(CGFloat(startX) + CGFloat(i) * tileSquareWidth(), CGFloat(startY))
-                tileRack.append(position)
                 let square = drawPlayersTiles(letter, placement: position)
                 square.name = String(letter)
                 player1Tiles.append(square)
@@ -307,7 +279,8 @@ class GameScene: SKScene {
 
             if let poppedTile = tileBag.getnextTile() {
                 let letter = poppedTile.getLetter()
-                let square = drawPlayersTiles(letter, placement: CGPointMake(CGFloat(startX) + CGFloat(i) * boardSquareWidth(), CGFloat(startY)))
+                let position = CGPointMake(CGFloat(startX) + CGFloat(i) * tileSquareWidth(), CGFloat(startY))
+                let square = drawPlayersTiles(letter, placement: position)
                 square.name = String(letter)
                 square.hidden = true
                 player2Tiles.append(square)
@@ -320,6 +293,67 @@ class GameScene: SKScene {
     }
     
     
+    func checkSpellings() -> Bool {
+        let curPlayerTiles = player1Turn ? player1Tiles : player2Tiles
+        var rows = [Int:Bool]()
+        var cols = [Int:Bool]()
+        var playedTiles = [TileSpriteNode]()
+        var allValidSpelling = true
+        for each in curPlayerTiles {
+            let tileNode = each as! TileSpriteNode
+            if tileNode.getRow() != nil && tileNode.getCol() != nil {
+                //that means it got placed onto the board.
+                rows[tileNode.getRow()!] = true
+                cols[tileNode.getCol()!] = true
+                playedTiles.append(tileNode)
+            }
+        }
+        
+        if playedTiles.count > 0 {
+            if rows.count == 1 {
+                //we need to figure out if they are in a row.
+                let horizontalIsOK = checkHorizontalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
+//                print("Horizontal Spelling = \(horizontalIsOK)")
+                if !horizontalIsOK {
+                    allValidSpelling = false
+                }
+                for each in playedTiles {
+                    let verticalSpellings = checkVerticalWord(each.getRow()!, col: each.getCol()!)
+//                    print("vertical Spelling = \(verticalSpellings)")
+                    if !verticalSpellings {
+                        allValidSpelling = false
+                    }
+                }
+                
+            }
+            if cols.count == 1 {
+                //we need to figure out if they are in a row.
+                let verticalIsOk = checkVerticalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
+//                print("vertical Spelling = \(verticalIsOk)")
+                if !verticalIsOk {
+                    allValidSpelling = false
+                }
+                for each in playedTiles {
+                    let horizontal = checkHorizontalWord(each.getRow()!, col: each.getCol()!)
+//                    print("Horizontal Spelling = \(horizontal)")
+                    if !horizontal {
+                        allValidSpelling = false
+                    }
+                }
+            }
+        }
+        
+        return allValidSpelling
+    }
+    
+    func playMove() {
+        print("Play move called")
+        if checkSpellings() {
+            //TODO: we want to give the first player new tiles back.
+            
+            switchPlayersTiles()
+        }
+    }
 
     /**
      This will reset the tiles back to the players positions.
@@ -327,20 +361,40 @@ class GameScene: SKScene {
     func resetTiles() {
         let curPlayerTiles = player1Turn ? player1Tiles : player2Tiles
         for (ndx, each) in curPlayerTiles.enumerate() {
-            each.position = tilePlacements[ndx]
             let sks = each as! TileSpriteNode
+            each.position = tilePlacements[ndx]
             sks.size = tileSquareSize()
+            setBoardToMatchTile(sks, state: BoardSquareSpriteNode.SquareState.Empty)
+            sks.col = nil
+            sks.row = nil
         }
     }
-//
-//    
+
+    /**
+     Since the tiles have rowIndex, colIndex, we want to check that rowIndex and
+     colIndex, and then set that one to the state it is.
+     */
+    func setBoardToMatchTile(tileNode : TileSpriteNode, state : BoardSquareSpriteNode.SquareState){
+        if let row = tileNode.getRow() {
+            if let col = tileNode.getCol() {
+                gameboard[row][col].state = state
+                
+                if state == .Empty {
+                    gameboard[row][col].letter = nil
+                }
+            }
+        }
+    }
+    
     /**
      Whoever is the player, it toggles the view of their player's tiles.
      */
     func togglePlayerTiles (playersTiles: Array<SKNode>) {
-        //TODO: This will have to make sure the tiles that are placed stay visible on the board.
         for each in playersTiles {
-            each.hidden = !each.hidden
+            var tileNode = each as! TileSpriteNode
+            if tileNode.getCol() == nil && tileNode.getCol() == nil {
+                tileNode.hidden = !tileNode.hidden
+            }
         }
     }
     
@@ -404,6 +458,14 @@ class GameScene: SKScene {
     }
     
     
+    //now if we want to drag the tile back onto the rack, we need to find the open spot
+    func setOntoTileRack(curPoint : CGPoint) -> CGPoint? {
+        //we want to be able to drop the tile onto the rack,
+        //and find the open rack position
+        return nil
+    }
+    
+    
     //if we touch a player's tiles, then we want to store that tiles
     //original position in case we couldn't place it where it is suposed to be
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -416,10 +478,12 @@ class GameScene: SKScene {
             if player1Turn && player1Tiles.contains(touchedNode!) {
                 originalPosition = touchedNode!.position
                 touchedNode!.zPosition = CGFloat(2)
+                curMovingNode = touchedNode as! TileSpriteNode
             }
             else if !player1Turn && player2Tiles.contains(touchedNode!) {
                 originalPosition = touchedNode!.position
                 touchedNode!.zPosition = CGFloat(2)
+                curMovingNode = touchedNode as! TileSpriteNode
             }
         }
     }
@@ -439,7 +503,7 @@ class GameScene: SKScene {
             deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
         }
         else {
-            curMovingNode = nil
+//            curMovingNode = nil
             deltaPoint = CGPointZero
         }
         
@@ -449,22 +513,12 @@ class GameScene: SKScene {
 
     func placeTileOntoBoard(curBoardSquare : BoardSquareSpriteNode?, tileNode: TileSpriteNode) {
         curBoardSquare!.setFilled(.Placed)
+        curBoardSquare!.setLetter(tileNode.letter!)
         tileNode.size = boardSquareSize()
         tileNode.setPosition(curBoardSquare!.rowIndex, col: curBoardSquare!.colIndex)
     }
     
-    /**
-     Since the tiles have rowIndex, colIndex, we want to check that rowIndex and
-     colIndex, and then set that one to the state it is.
-     */
-    func setBoardToMatchTile(boardSquare : BoardSquareSpriteNode, tileNode : TileSpriteNode, state : BoardSquareSpriteNode.SquareState){
-        if let row = tileNode.getRow() {
-            if let col = tileNode.getCol() {
-                gameboard[row][col].state = state
-                print("row = \(row), col = \(col) is now \(state)")
-            }
-        }
-    }
+
 
     /*
     Friday Feb 26th,
@@ -481,27 +535,27 @@ class GameScene: SKScene {
             //this is the position of the dragged tile
             var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x + xOffset, curNode.position.y + self.deltaPoint.y - yOffset)
 
-            //convert the xIndex and yIndex to a 1 dimensional array
             let curBoardSquare = getBoardSquare(newPoint)
             //and then check if it is within the squarePlacements
             
             if curBoardSquare != nil {
                 //before we check if that space is filled,
                 //we want to reset the previous board position
-                
                 if !(curBoardSquare!.isFilled()) {
                     newPoint.x = curBoardSquare!.initX
                     newPoint.y = curBoardSquare!.initY
-                    setBoardToMatchTile(curBoardSquare!, tileNode: curNode, state: .Empty)
+                    setBoardToMatchTile(curNode, state: .Empty)
                     placeTileOntoBoard(curBoardSquare, tileNode: curNode)
+                    //this is for the logic portion
                     print("col = \(curBoardSquare!.colIndex), row = \(curBoardSquare!.rowIndex) ")
                 }
                 else {
-                    setBoardToMatchTile(curBoardSquare!, tileNode: curNode, state: .Placed)
+                    setBoardToMatchTile(curNode, state: .Placed)
                     newPoint = originalPosition!
                     print("cannot be placed there")
                 }
             }
+            
         
             //resetting the state
 
@@ -555,6 +609,81 @@ class GameScene: SKScene {
 
     }
     
+    
+ 
+    /**
+     This takes in current row and current column that the
+     placed tile is on and will check the
+     current column if the spelling is correct.
+     */
+    func checkVerticalWord(row : Int, col : Int) -> Bool {
+        var wordAtMoment:String = ""
+        var curRow = row
+        
+        while curRow >= 0 && gameboard[curRow][col].isFilled() {
+            wordAtMoment = (String(gameboard[curRow][col].getLetter()!) + wordAtMoment).lowercaseString
+            curRow -= 1
+        }
+        
+        curRow = row + 1
+        while curRow < gameboardSize && gameboard[curRow][col].isFilled() {
+            wordAtMoment += String(gameboard[curRow][col].getLetter()!).lowercaseString
+            curRow += 1
+        }
+        
+        print ("vertical word : \(wordAtMoment)")
+        if wordAtMoment.characters.count == 1 {
+            return true
+        }
+        
+        return isSpellingCorrect(wordAtMoment)
+    }
+    
+    /**
+     This takes in current row and current column that the
+     placed tile is on and will check the
+     current row if the spelling is correct.
+     */
+    func checkHorizontalWord(row : Int, col : Int) -> Bool {
+        var wordAtMoment:String = ""
+        var curCol = col
+        
+        
+        //append to left side of word
+        while curCol >= 0 && gameboard[row][curCol].isFilled() {
+            wordAtMoment = String(gameboard[row][curCol].getLetter()!) + wordAtMoment
+            wordAtMoment = wordAtMoment.lowercaseString
+            curCol -= 1
+            print ("Word at moment \(wordAtMoment)")
+            
+        }
+        
+        //append to right side of word
+        curCol = col + 1
+        while curCol < gameboardSize && gameboard[row][curCol].isFilled() {
+            wordAtMoment += String(gameboard[row][curCol].getLetter()!)
+            wordAtMoment = wordAtMoment.lowercaseString
+            curCol += 1
+            print ("Word at moment \(wordAtMoment)")
+            
+        }
+        
+        if wordAtMoment.characters.count == 1 {
+            return true
+        }
+        
+        return isSpellingCorrect(wordAtMoment)
+    }
+    
+    
+    func isSpellingCorrect(word : String) -> Bool {
+                print("Current word \(word)")
+        let lcword = word.lowercaseString
+        let checker = UITextChecker()
+        let range = NSMakeRange(0, lcword.characters.count)
+        let misspelledRange = checker.rangeOfMisspelledWordInString(lcword, range: range, startingAt: 0, wrap: false, language: "en")
+        return misspelledRange.location == NSNotFound
+    }
     
 }
 
