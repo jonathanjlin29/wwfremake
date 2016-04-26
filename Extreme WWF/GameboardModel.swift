@@ -73,23 +73,52 @@ class GameboardModel {
     /**
      Returns the spellings that were made by the currently active tiles.
      */
-    func checkAllSpellings(activeTiles: Array<(row: Int, col: Int)>) -> Array<String> {
-        var spellings = Array<String>()
-        for each in activeTiles {
-            spellings.append(getVerticalWord(each.row, col: each.col))
-            spellings.append(getVerticalWord(each.row, col: each.col))
+    func getAllSpellings(activeTiles: Array<(row: Int, col: Int)>) -> [String: Int] {
+        var spellings = Dictionary<String, Int>()
+        var whichWay = isInStraightLine(activeTiles)
+        if whichWay.horizontal {
+            for each in activeTiles {
+                let vertWord = getVerticalWord(each.row, col: each.col)
+                if spellings[vertWord.word] == nil {
+                    spellings[vertWord.word] = 0
+                }
+                spellings[vertWord.word]! += vertWord.points
+            }
+            let horizWord = getHorizontalWord(activeTiles[0].row, col: activeTiles[0].col)
+            if spellings[horizWord.word] == nil {
+                spellings[horizWord.word] = 0
+            }
+            spellings[horizWord.word]! += horizWord.points
         }
-        return spellings.sort()
+        
+        if whichWay.vertical {
+            for each in activeTiles {
+                let horizWord = getHorizontalWord(each.row, col: each.col)
+                if spellings[horizWord.word] == nil {
+                    spellings[horizWord.word] = 0
+                }
+                spellings[horizWord.word]! += horizWord.points
+            }
+            let vertWord = getVerticalWord(activeTiles[0].row, col: activeTiles[0].col)
+            if spellings[vertWord.word] == nil {
+                spellings[vertWord.word] = 0
+            }
+            spellings[vertWord.word]! += vertWord.points
+            
+        }
+
+        return spellings
     }
     
     
     /**
      Checks if the move is valid: Words are spelled straight.
      */
-    func isInStraightLine(activeTiles: Array<(row: Int, col: Int)>) -> Bool {
+    func isInStraightLine(activeTiles: Array<(row: Int, col: Int)>) ->
+        (vertical: Bool, horizontal: Bool) {
         if activeTiles.count == 0 {
-            print("No words even there")
-            return false
+            print("No tile is placed here.")
+            return (vertical: false, horizontal: false)
         }
 
         var tilesInOrder = activeTiles.sort({ (one, two) -> Bool in
@@ -111,39 +140,27 @@ class GameboardModel {
         var vertically = false
         var horizontally = false
         for each in activeTiles {
-            if each.row != activeTiles[0].row {
-                vertically = true
-            }
-            if each.col != activeTiles[0].col {
-                horizontally = true
-            }
+            vertically = each.row != activeTiles[0].row ? true : false
+            horizontally = each.col != activeTiles[0].col ? true : false
         }
         
-        if vertically {
-            var compare = tilesInOrder[0]
-            for each in 1..<tilesInOrder.count {
-                if tilesInOrder[each].row != compare.row + 1 {
-                    return false
-                }
-                compare = tilesInOrder[each]
+        var compare = tilesInOrder[0]
+        for each in 1..<tilesInOrder.count {
+            if vertically && tilesInOrder[each].row != compare.row + 1 {
+                return (vertical: false, horizontal: false)
             }
-        }
-        
-        if horizontally {
-            var compare = tilesInOrder[0]
-            for each in  1..<tilesInOrder.count {
-                if tilesInOrder[each].col != compare.col + 1 {
-                    return false
-                }
-                compare = tilesInOrder[each]
+            if horizontally && tilesInOrder[each].col != compare.col + 1 {
+                return (vertical: false, horizontal: false)
             }
+            compare = tilesInOrder[each]
         }
-        
+    
         if !vertically && !horizontally {
-            return false
+            print("neither vertical nor horizontal")
+            return (vertical: false, horizontal: false)
         }
         
-        return true
+        return (vertical: vertically, horizontal: horizontally)
         
     }
     
@@ -159,68 +176,25 @@ class GameboardModel {
     }
     
     
-    
-    
-//    func getWords() -> Array<String> {
-//        
-//        var rows = [Int:Bool]()
-//        var cols = [Int:Bool]()
-//        var playedTiles = [TileSpriteNode]()
-//  
-//        var wordsPlayed:Array<String> = Array<String>()
-//        if currentActiveTiles.count > 0 {
-//            if rows.count == 1 {
-//                //we need to figure out if they are in a row.
-//                let horizontalSpelling = checkHorizontalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
-//                if horizontalSpelling.characters.count > 1 {
-//                    wordsPlayed.append(horizontalSpelling)
-//                }
-//                
-//                
-//                for each in playedTiles {
-//                    let verticalSpellings = checkVerticalWord(each.getRow()!, col: each.getCol()!)
-//                    if verticalSpellings.characters.count > 1 {
-//                        wordsPlayed.append(verticalSpellings)
-//                    }
-//                }
-//                
-//            }
-//            else if cols.count == 1 {
-//                //we need to figure out if they are in a row.
-//                let verticalSpelling = checkVerticalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
-//                if verticalSpelling.characters.count > 1 {
-//                    wordsPlayed.append(verticalSpelling)
-//                }
-//                for each in playedTiles {
-//                    let horizontalSpelling = checkHorizontalWord(each.getRow()!, col: each.getCol()!)
-//                    if horizontalSpelling.characters.count > 1 {
-//                        wordsPlayed.append(horizontalSpelling)
-//                    }
-//                }
-//            }
-//        }
-//        return wordsPlayed
-//    }
-    
-    
     /**
      This takes in current row and current column that the
      placed tile is on and will check the
      current column if the spelling is correct.
      */
-    func getVerticalWord(row : Int, col : Int) -> String {
+    func getVerticalWord(row : Int, col : Int) -> (word: String, points: Int) {
         if !gameboard[row][col].filled {
-            return ""
+            return (word: "", points: 0)
         }
-        
-        
+
         var wordAtMoment:String = ""
         var curRow = row
+        var curPoints = 0
         
         //append to above the placed letter
         while curRow >= 0 && gameboard[curRow][col].filled {
             wordAtMoment = String(gameboard[curRow][col].tile!.letter) + wordAtMoment
             wordAtMoment = wordAtMoment.lowercaseString
+            curPoints += gameboard[curRow][col].value
             curRow -= 1
         }
         
@@ -229,9 +203,11 @@ class GameboardModel {
         while curRow < numRowsOrCols && gameboard[curRow][col].filled {
             wordAtMoment += String(gameboard[curRow][col].tile!.letter)
             wordAtMoment = wordAtMoment.lowercaseString
+            curPoints += gameboard[curRow][col].value
             curRow += 1
         }
-        return wordAtMoment
+        
+        return (word: wordAtMoment, points: curPoints)
     }
     
 
@@ -240,19 +216,20 @@ class GameboardModel {
      placed tile is on and will check the
      current row if the spelling is correct.
      */
-    func getHorizontalWord(row : Int, col : Int) -> String {
+    func getHorizontalWord(row : Int, col : Int) -> (word: String, points: Int) {
         if !gameboard[row][col].filled {
-            return ""
+            return (word: "", points: 0)
         }
         var wordAtMoment:String = ""
         var curCol = col
+        var curPoints = 0
         
         //append to left side of placed letter
         while curCol >= 0 && gameboard[row][curCol].filled {
             wordAtMoment = String(gameboard[row][curCol].tile!.letter) + wordAtMoment
             wordAtMoment = wordAtMoment.lowercaseString
+            curPoints += gameboard[row][curCol].value
             curCol -= 1
-            print ("Word at moment \(wordAtMoment)")
         }
         
         //append to right side of placed letter
@@ -260,11 +237,10 @@ class GameboardModel {
         while curCol < numRowsOrCols && gameboard[row][curCol].filled {
             wordAtMoment += String(gameboard[row][curCol].tile!.letter)
             wordAtMoment = wordAtMoment.lowercaseString
+            curPoints += gameboard[row][curCol].value
             curCol += 1
-            print ("Word at moment \(wordAtMoment)")
-            
         }
-        return wordAtMoment
+        return (word: wordAtMoment, points: curPoints)
     }
     
         

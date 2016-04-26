@@ -33,28 +33,32 @@ class GameboardModelSpelling: XCTestCase {
         activeTiles.append((row: 1, col : 1))
         activeTiles.append((row: 2, col : 1))
         activeTiles.append((row: 3, col : 1))
-        XCTAssert(gameboard!.isInStraightLine(activeTiles))
+        XCTAssert(gameboard!.isInStraightLine(activeTiles).vertical)
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTiles).horizontal)
         
         var activeTilesWrong = Array<(row: Int, col: Int)>()
         activeTilesWrong.append((row: 0, col : 1))
         activeTilesWrong.append((row: 2, col : 3))
         activeTilesWrong.append((row: 2, col : 1))
         activeTilesWrong.append((row: 3, col : 1))
-        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesWrong))
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesWrong).horizontal)
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesWrong).vertical)
         
         var activeTilesHorizontal = Array<(row: Int, col: Int)>()
         activeTilesHorizontal.append((row: 0, col : 1))
         activeTilesHorizontal.append((row: 0, col : 2))
         activeTilesHorizontal.append((row: 0, col : 3))
         activeTilesHorizontal.append((row: 0, col : 4))
-        XCTAssert(gameboard!.isInStraightLine(activeTilesHorizontal))
+        XCTAssert(gameboard!.isInStraightLine(activeTilesHorizontal).horizontal)
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesHorizontal).vertical)
         
         var activeTilesDiagonalWrong = Array<(row: Int, col: Int)>()
         activeTiles.append((row: 0, col : 0))
         activeTiles.append((row: 1, col : 1))
         activeTiles.append((row: 2, col : 2))
         activeTiles.append((row: 3, col : 3))
-        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong))
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).horizontal)
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).vertical)
         
         var random = Array<(row: Int, col: Int)>()
         random.append((row:5, col : 4))
@@ -62,7 +66,9 @@ class GameboardModelSpelling: XCTestCase {
         random.append((row:4, col : 7))
         random.append((row:6, col : 1))
         random.append((row:6, col : 6))
-        XCTAssertFalse(gameboard!.isInStraightLine(random))
+        XCTAssertFalse(gameboard!.isInStraightLine(random).horizontal)
+        XCTAssertFalse(gameboard!.isInStraightLine(random).vertical
+        )
         
     }
     
@@ -73,18 +79,19 @@ class GameboardModelSpelling: XCTestCase {
         gameboard?.gameboard[0][3].setTile(Tile(curLet: "i"))
         gameboard?.gameboard[0][4].setTile(Tile(curLet: "n"))
         gameboard?.gameboard[0][5].setTile(Tile(curLet: "g"))
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 1), "string")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 2), "string")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 3), "string")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 4), "string")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 5), "string")
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 2) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 3) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 4) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 5) == (word: "string",points: 9))
+    
         
         gameboard?.gameboard[0][4].clearSquare()
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 1), "stri")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 2), "stri")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 3), "stri")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 4), "")
-        XCTAssertEqual(gameboard!.getHorizontalWord( 0, col : 5), "g")
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 1) == (word: "stri", points: 4))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 2) == (word: "stri", points: 4))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 3) == (word: "stri", points: 4))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 4) == (word: "",points: 0))
+        XCTAssert(gameboard!.getHorizontalWord( 0, col : 5) == (word: "g",points: 3))
     
     }
     
@@ -95,24 +102,22 @@ class GameboardModelSpelling: XCTestCase {
         gameboard?.gameboard[3][1].setTile(Tile(curLet: "i"))
         gameboard?.gameboard[4][1].setTile(Tile(curLet: "n"))
         gameboard?.gameboard[5][1].setTile(Tile(curLet: "g"))
-        XCTAssertEqual(gameboard!.getVerticalWord(0, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(1, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(2, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(3, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(4, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(5, col: 1), "string")
-        XCTAssertEqual(gameboard!.getVerticalWord(0, col: 2), "")
-        XCTAssertEqual(gameboard!.getVerticalWord(1, col: 2), "")
-        XCTAssertEqual(gameboard!.getVerticalWord(2, col: 2), "")
-        XCTAssertEqual(gameboard!.getVerticalWord(3, col: 2), "")
-        XCTAssertEqual(gameboard!.getVerticalWord(4, col: 2), "")
+        XCTAssert(gameboard!.getVerticalWord(0, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(1, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(2, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(3, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(4, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(5, col: 1) == (word: "string",points: 9))
+        XCTAssert(gameboard!.getVerticalWord(0, col: 2) == (word: "",points: 0))
+        XCTAssert(gameboard!.getVerticalWord(1, col: 2) == (word: "",points: 0))
+        XCTAssert(gameboard!.getVerticalWord(2, col: 2) == (word: "",points: 0))
         gameboard!.gameboard[3][1].clearSquare()
-        XCTAssertEqual(gameboard!.getVerticalWord(0, col: 1), "str")
-        XCTAssertEqual(gameboard!.getVerticalWord(1, col: 1), "str")
-        XCTAssertEqual(gameboard!.getVerticalWord(2, col: 1), "str")
-        XCTAssertEqual(gameboard!.getVerticalWord(3, col: 1), "")
-        XCTAssertEqual(gameboard!.getVerticalWord(4, col: 1), "ng")
-        XCTAssertEqual(gameboard!.getVerticalWord(5, col: 1), "ng")
+        XCTAssert(gameboard!.getVerticalWord(0, col: 1) == (word: "str",points: 3))
+        XCTAssert(gameboard!.getVerticalWord(1, col: 1) == (word: "str",points: 3))
+        XCTAssert(gameboard!.getVerticalWord(2, col: 1) == (word: "str",points: 3))
+        XCTAssert(gameboard!.getVerticalWord(3, col: 1) == (word: "",points: 0))
+        XCTAssert(gameboard!.getVerticalWord(4, col: 1) == (word: "ng",points: 5))
+        XCTAssert(gameboard!.getVerticalWord(5, col: 1) == (word: "ng",points: 5))
         
     }
     
@@ -141,9 +146,21 @@ class GameboardModelSpelling: XCTestCase {
         active.append((row: 2, col: 3))
         active.append((row: 2, col: 4))
         active.append((row: 2, col: 5))
-        for each in gameboard!.checkAllSpellings(active) {
-            
+        var results =  gameboard!.getAllSpellings(active)
+        for each in results {
+            print (each)
         }
+        XCTAssertEqual(results["gn"], 5)
+        XCTAssertEqual(results["iw"], 5)
+        XCTAssertEqual(results["ni"], 3)
+        XCTAssertEqual(results["ro"], 2)
+        XCTAssertEqual(results["rowin"], 9)
+//
+//        var active_t = Array<(row: Int, col : Int)> ()
+//        active_t.append((row: 1, col: 1))
+//        var results_t = gameboard!.checkAllSpellings(active_t)
+//        XCTAssertEqual(results_t[0], "string")
+//        XCTAssertEqual(results_t[1], "string")
     }
     func testPerformanceExample() {
         // This is an example of a performance test case.
