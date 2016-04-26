@@ -13,15 +13,30 @@ import SpriteKit
 class TileSpriteNode: SKSpriteNode {
     var row:Int?
     var col:Int?
+    var tilePosition:Int?
     var letter:Character?
     var pointValue:Int?
-
+    var OnBoardOnTileRack:BoardOrTileRack
+    
+    
+    enum BoardOrTileRack {
+        case Board
+        case TileRack
+    }
 
     init(texture: SKTexture!) {
+        OnBoardOnTileRack = .TileRack
+        super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
+    }
+    
+    init(texture: SKTexture!, tilePos : Int?) {
+        self.tilePosition = tilePos
+        OnBoardOnTileRack = .TileRack
         super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
     }
     
     required init?(coder aDecoder: NSCoder) {
+        OnBoardOnTileRack = .TileRack
         super.init(coder: aDecoder)
     }
     
@@ -37,8 +52,16 @@ class TileSpriteNode: SKSpriteNode {
     func setPosition(row : Int, col : Int ) {
         self.row = row
         self.col = col
+        OnBoardOnTileRack = .Board
     }
     
+    
+    func putOntoTileRack(tilePos : Int) {
+        tilePosition = tilePos
+        OnBoardOnTileRack = .TileRack
+        row = nil
+        col = nil
+    }
     /**
      gets the row that the tile sprite node is resting on.
      */
@@ -63,10 +86,8 @@ class TileSpriteNode: SKSpriteNode {
     /**
      SEts the column that the tile sprite node is resting on.
      */
-    func setCol (row : Int?) {
-        self.row = row
+    func setCol (col : Int?) {
+        self.col = col
     }
-    
-    
     
 }

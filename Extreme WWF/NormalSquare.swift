@@ -13,10 +13,29 @@ import Foundation
  does not have a multiplier.
 */
 class NormalSquare: AbstractBoardSquare {
-
-    override init() {
-        super.init()
-        self.state = .Empty
+    var value:Int
+    var filled:Bool
+    var tile:Tile?
+    var state:SquareState
+    
+    init() {
+        value = 0
+        filled = false
+        tile = nil
+        state = .Empty
     }
     
+    func setTile(t : Tile) {
+        tile = t
+        filled = true
+        state = .Placed
+        value = t.getPointValue()
+    }
+    
+    func clearSquare() {
+        tile = nil
+        filled = false
+        state = .Empty
+        value = 0
+    }
 }

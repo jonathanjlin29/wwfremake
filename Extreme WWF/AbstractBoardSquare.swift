@@ -8,43 +8,15 @@
 
 import Foundation
 
-class AbstractBoardSquare {
-    var value:Int
-    var hasLetter:Bool
-    var letterOnSpace:Tile?
-    var state:SquareState
+/**
+ This is an abstract board square. A board square
+ must implement this protocol.
+ */
+protocol AbstractBoardSquare {
+    var value:Int {get set}
+    var filled:Bool {get set}
+    var tile:Tile? {get set}
+    var state:SquareState {get set}
     
-    init() {
-        self.value = 0
-        self.hasLetter = false
-        self.letterOnSpace = nil
-        self.state = SquareState.Empty
-    }
-    
-    func getState() -> SquareState {
-        return state
-    }
-    
-    func setState(newState: SquareState) {
-        self.state = newState
-    }
-    
-    func getValue() -> Int {
-        return self.value
-    }
-    
-    func getLetterOnSpace() -> Tile? {
-        return letterOnSpace
-    }
-    
-    func isFilled() -> Bool {
-        switch (state) {
-        case .Empty:
-            return false
-        case .Final:
-            return true
-        case .Placed:
-            return true
-        }
-    }
+    func setTile(t : Tile)
 }

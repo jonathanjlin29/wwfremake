@@ -14,6 +14,20 @@ import Foundation
  a player's turn, or multiplying point values of word or letter
 */
 class SpecialSquare: AbstractBoardSquare {
+    var value:Int
+    var filled:Bool
+    var tile:Tile?
+    var state:SquareState
     
+    init() {
+        value = 0
+        filled = false
+        tile = nil
+        state = .Empty
+    }
+    
+    func setTile(t : Tile) {
+        
+    }
     
 }

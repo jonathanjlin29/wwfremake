@@ -11,10 +11,20 @@ import Foundation
 
 class TileDictionary {
     
+    static func getDictionary() -> [Character] {
+        let aScalars = "a".unicodeScalars
+        let aCode = aScalars[aScalars.startIndex].value
+        
+        let letters: [Character] = (0..<26).map {
+            i in Character(UnicodeScalar(aCode + i))
+        }
+        
+        return letters
+    }
     static func getNumTimesOfLetter() -> [Character: Int] {
         var numOfEachLetter = [Character:Int]()
-        numOfEachLetter["a"] =  9
-        numOfEachLetter["b"] =  2
+        numOfEachLetter["A"] =  9
+        numOfEachLetter["B"] =  2
         numOfEachLetter["C"] =  2
         numOfEachLetter["D"] =  5
         numOfEachLetter["E"] =  13
@@ -39,16 +49,17 @@ class TileDictionary {
         numOfEachLetter["X"] =  1
         numOfEachLetter["Y"] =  2
         numOfEachLetter["Z"] =  1
-        numOfEachLetter["_"] =  2
+        numOfEachLetter["_"] =  2 //put back to 2
         
         return numOfEachLetter
     }
 
     static func getLetterValue(letter: Character) -> Int {
-        switch letter {
-        case "a":
+        let str = String(letter)
+        switch str.uppercaseString {
+        case "A":
             return 1
-        case "b":
+        case "B":
             return 4
         case "C":
             return 4

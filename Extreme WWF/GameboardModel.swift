@@ -10,28 +10,23 @@ import Foundation
 
 import UIKit
 
-class BoardTileIndices {
-    var rowIndex: Int
-    var colIndex: Int
-    
-    init( row: Int, col: Int ) {
-        self.rowIndex = row
-        self.colIndex = col
-    }
-}
-
 class GameboardModel {
     //this is the NxN sized gameboard
-    var gameboard:[[AbstractBoardSquare]]
+    var gameboard:[[NormalSquare]]
     //this is the size of the gameboard
     var numRowsOrCols: Int
     
+    //list of active spots
+    //Example of active tiles: (row: 0, col: 0)
+    var currentActiveTiles:Array<(row: Int, col: Int)>
+    
     
     init(GameboardSize: Int) {
-        self.gameboard = [[AbstractBoardSquare]]()
+        self.currentActiveTiles = Array<(row: Int, col: Int)>()
+        self.gameboard = [[NormalSquare]]()
         self.numRowsOrCols = GameboardSize
         for _ in 1...GameboardSize {
-             var newGameboard = [AbstractBoardSquare]()
+             var newGameboard = [NormalSquare]()
             for _ in 1...GameboardSize {
                 newGameboard.append(NormalSquare())
             }
@@ -40,81 +35,215 @@ class GameboardModel {
     }
     
     /**
+     This will restore the state of the board and reset the currentActive tiles.
+     */
+    func resetTiles() {
+        for each in currentActiveTiles {
+            gameboard[each.row][each.col].state = .Empty
+        }
+        currentActiveTiles.removeAll()
+    }
+    
+ 
+    
+    /**
+     Returns the state of the gameboard square.
+     */
+    func boardSquareState(row: Int, col : Int) -> SquareState {
+        return gameboard[row][col].state
+    }
+    
+    //This function will make sure the board matches the state set
+    func setBoardSquareState(row: Int, col: Int, state : SquareState) -> AbstractBoardSquare? {
+        if boardSquareState(row, col: col) == .Empty {
+            return nil
+        }
+        //apply business logic here
+        return NormalSquare()
+    }
+    
+
+    /**
+     Returns the point value of the currently played word (or words).
+     */
+    func getPointValue() -> Int {
+        return 0
+    }
+    
+    /**
+     Returns the spellings that were made by the currently active tiles.
+     */
+    func checkAllSpellings(activeTiles: Array<(row: Int, col: Int)>) -> Array<String> {
+//        for each in activeTiles {
+        return Array<String>()
+    }
+    
+    
+    /**
+     Checks if the move is valid: Words are spelled straight.
+     */
+    func isInStraightLine(activeTiles: Array<(row: Int, col: Int)>) -> Bool {
+        if activeTiles.count == 0 {
+            print("No words even there")
+            return false
+        }
+
+        var tilesInOrder = activeTiles.sort({ (one, two) -> Bool in
+            if one.row < two.row {
+                return true
+            }
+            else if one.row == two.row {
+                if one.col < two.col {
+                    return true
+                }
+                else {
+                    return false
+                }
+            }
+            
+            return false
+        })
+        
+        var vertically = false
+        var horizontally = false
+        for each in activeTiles {
+            if each.row != activeTiles[0].row {
+                vertically = true
+            }
+            if each.col != activeTiles[0].col {
+                horizontally = true
+            }
+        }
+        
+        if vertically {
+            var compare = tilesInOrder[0]
+            for each in 1..<tilesInOrder.count {
+                if tilesInOrder[each].row != compare.row + 1 {
+                    return false
+                }
+                compare = tilesInOrder[each]
+            }
+        }
+        
+        if horizontally {
+            var compare = tilesInOrder[0]
+            for each in  1..<tilesInOrder.count {
+                if tilesInOrder[each].col != compare.col + 1 {
+                    return false
+                }
+                compare = tilesInOrder[each]
+            }
+        }
+        
+        if !vertically && !horizontally {
+            return false
+        }
+        
+        return true
+        
+    }
+    
+    
+    
+    
+    /**
+     This function checks if there is a valid move. Then it checks spellings.
+     Then it calculates points. Then it returns the actual point values.
+     */
+    func playMove() -> Int {
+        return 0
+    }
+    
+    
+    
+    
+//    func getWords() -> Array<String> {
+//        
+//        var rows = [Int:Bool]()
+//        var cols = [Int:Bool]()
+//        var playedTiles = [TileSpriteNode]()
+//  
+//        var wordsPlayed:Array<String> = Array<String>()
+//        if currentActiveTiles.count > 0 {
+//            if rows.count == 1 {
+//                //we need to figure out if they are in a row.
+//                let horizontalSpelling = checkHorizontalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
+//                if horizontalSpelling.characters.count > 1 {
+//                    wordsPlayed.append(horizontalSpelling)
+//                }
+//                
+//                
+//                for each in playedTiles {
+//                    let verticalSpellings = checkVerticalWord(each.getRow()!, col: each.getCol()!)
+//                    if verticalSpellings.characters.count > 1 {
+//                        wordsPlayed.append(verticalSpellings)
+//                    }
+//                }
+//                
+//            }
+//            else if cols.count == 1 {
+//                //we need to figure out if they are in a row.
+//                let verticalSpelling = checkVerticalWord(playedTiles[0].getRow()!, col: playedTiles[0].getCol()!)
+//                if verticalSpelling.characters.count > 1 {
+//                    wordsPlayed.append(verticalSpelling)
+//                }
+//                for each in playedTiles {
+//                    let horizontalSpelling = checkHorizontalWord(each.getRow()!, col: each.getCol()!)
+//                    if horizontalSpelling.characters.count > 1 {
+//                        wordsPlayed.append(horizontalSpelling)
+//                    }
+//                }
+//            }
+//        }
+//        return wordsPlayed
+//    }
+    
+    
+    /**
      This takes in current row and current column that the
      placed tile is on and will check the
      current column if the spelling is correct.
      */
     func checkVerticalWord(row : Int, col : Int) -> Bool {
-        var wordAtMoment:String = ""
-        var curRow = row
-
-        print("Appending to before")
-        while curRow >= 0 && gameboard[curRow][col].hasLetter {
-            wordAtMoment = String(gameboard[curRow][col].getLetterOnSpace()?.getLetter()) + wordAtMoment
-            curRow -= 1
-        }
-        
-        curRow = row + 1
-        print("Appending to after")
-        while curRow < numRowsOrCols && gameboard[curRow][col].hasLetter {
-            wordAtMoment += String(gameboard[curRow][col].getLetterOnSpace()?.getLetter())
-            curRow += 1
-        }
-        
-        if wordAtMoment.characters.count == 1 {
-            return true
-        }
-        
-        return isSpellingCorrect(wordAtMoment)
+        return true
+       
     }
 
     /**
-        This takes in current row and current column that the
-        placed tile is on and will check the
-        current row if the spelling is correct.
+     This takes in current row and current column that the
+     placed tile is on and will check the
+     current row if the spelling is correct.
      */
-    func checkHorizontalWord(row : Int, col : Int) -> Bool {
+    func getHorizontalWord(row : Int, col : Int) -> String {
+        /**
+         This takes in current row and current column that the
+         placed tile is on and will check the
+         current row if the spelling is correct.
+         */
         var wordAtMoment:String = ""
         var curCol = col
         
-        while curCol >= 0 && gameboard[row][curCol].isFilled() {
-            wordAtMoment = String(gameboard[row][curCol].getLetterOnSpace()?.getLetter()) + wordAtMoment
+        //append to left side of word
+        while curCol >= 0 && gameboard[row][curCol].filled {
+            wordAtMoment = String(gameboard[row][curCol].tile!.letter) + wordAtMoment
+            wordAtMoment = wordAtMoment.lowercaseString
             curCol -= 1
             print ("Word at moment \(wordAtMoment)")
-
         }
         
-        if wordAtMoment.characters.count == 1 {
-            return true
+        //append to right side of word
+        curCol = col + 1
+        while curCol < numRowsOrCols && gameboard[row][curCol].filled {
+            wordAtMoment += String(gameboard[row][curCol].tile!.letter)
+            wordAtMoment = wordAtMoment.lowercaseString
+            curCol += 1
+            print ("Word at moment \(wordAtMoment)")
+            
         }
-        
-        return isSpellingCorrect(wordAtMoment)
+        return wordAtMoment
     }
     
-    /**
-        The player places a letter ono the board, so this function
-        return whether the words spelled are valid or not
-     */
-    func placeLetter(row: Int, col: Int, letter: Character) -> Bool {
-        print("Place Letter \(letter): \(row),\(col)")
-        gameboard[row][col].letterOnSpace = Tile(curLet: letter)
-        gameboard[row][col].setState(SquareState.Placed)
         
-//        print("Vertical spelling")
-        let verticalSpelling = checkVerticalWord(row, col: col)
-        let horizontalSpelling = checkHorizontalWord(row, col: col)
-//        for )
-        
-        return horizontalSpelling
-//        return verticalSpelling && horizontalSpelling
-        
-    }
-    
-    func setupBoard() {
-        
-    }
-    
-    
     func getSize() -> Int {
         return self.numRowsOrCols
     }

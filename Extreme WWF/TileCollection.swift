@@ -82,8 +82,8 @@ class TileCollection {
     //This function takes in a letter,
     //and returns an SKSpriteNode that represents that letter
     func getTileNode(letter : Character) -> TileSpriteNode {
-        let squareTexture = SKTexture(imageNamed: "square_" + String(letter).capitalizedString)
-        var square = TileSpriteNode(texture: squareTexture)
+        let squareTexture = SKTexture(imageNamed: "square_" + String(letter).uppercaseString)
+        let square = TileSpriteNode(texture: squareTexture, tilePos: nil)
         square.setLetter(letter)
         return square
     }
