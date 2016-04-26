@@ -22,7 +22,7 @@
 		20608DF81C5DCC6800E01D12 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20608DF61C5DCC6800E01D12 /* Main.storyboard */; };
 		20608DFA1C5DCC6800E01D12 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 20608DF91C5DCC6800E01D12 /* Assets.xcassets */; };
 		20608DFD1C5DCC6800E01D12 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20608DFB1C5DCC6800E01D12 /* LaunchScreen.storyboard */; };
-		20608E081C5DCC6900E01D12 /* Extreme_WWFTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E071C5DCC6900E01D12 /* Extreme_WWFTests.swift */; };
+		20608E081C5DCC6900E01D12 /* GameboardModelSpelling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E071C5DCC6900E01D12 /* GameboardModelSpelling.swift */; };
 		20608E141C5DD27800E01D12 /* GameboardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E131C5DD27800E01D12 /* GameboardModel.swift */; };
 		20608E171C5DD35500E01D12 /* AbstractBoardSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */; };
 		20608E191C5EBAEB00E01D12 /* NormalSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E181C5EBAEB00E01D12 /* NormalSquare.swift */; };
@@ -64,7 +64,7 @@
 		20608DFC1C5DCC6800E01D12 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		20608DFE1C5DCC6800E01D12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		20608E031C5DCC6900E01D12 /* Extreme WWFTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Extreme WWFTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		20608E071C5DCC6900E01D12 /* Extreme_WWFTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extreme_WWFTests.swift; sourceTree = "<group>"; };
+		20608E071C5DCC6900E01D12 /* GameboardModelSpelling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameboardModelSpelling.swift; sourceTree = "<group>"; };
 		20608E091C5DCC6900E01D12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		20608E131C5DD27800E01D12 /* GameboardModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameboardModel.swift; sourceTree = "<group>"; };
 		20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractBoardSquare.swift; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		20608E061C5DCC6900E01D12 /* Extreme WWFTests */ = {
 			isa = PBXGroup;
 			children = (
-				20608E071C5DCC6900E01D12 /* Extreme_WWFTests.swift */,
+				20608E071C5DCC6900E01D12 /* GameboardModelSpelling.swift */,
 				20608E091C5DCC6900E01D12 /* Info.plist */,
 				205BA8821CCF1ADC00A4B817 /* TestGameboardModel.swift */,
 			);
@@ -336,7 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				205BA8831CCF1ADC00A4B817 /* TestGameboardModel.swift in Sources */,
-				20608E081C5DCC6900E01D12 /* Extreme_WWFTests.swift in Sources */,
+				20608E081C5DCC6900E01D12 /* GameboardModelSpelling.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

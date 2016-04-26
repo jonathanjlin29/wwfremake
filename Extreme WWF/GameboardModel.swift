@@ -74,8 +74,12 @@ class GameboardModel {
      Returns the spellings that were made by the currently active tiles.
      */
     func checkAllSpellings(activeTiles: Array<(row: Int, col: Int)>) -> Array<String> {
-//        for each in activeTiles {
-        return Array<String>()
+        var spellings = Array<String>()
+        for each in activeTiles {
+            spellings.append(getVerticalWord(each.row, col: each.col))
+            spellings.append(getVerticalWord(each.row, col: each.col))
+        }
+        return spellings.sort()
     }
     
     
@@ -204,10 +208,32 @@ class GameboardModel {
      placed tile is on and will check the
      current column if the spelling is correct.
      */
-    func checkVerticalWord(row : Int, col : Int) -> Bool {
-        return true
-       
+    func getVerticalWord(row : Int, col : Int) -> String {
+        if !gameboard[row][col].filled {
+            return ""
+        }
+        
+        
+        var wordAtMoment:String = ""
+        var curRow = row
+        
+        //append to above the placed letter
+        while curRow >= 0 && gameboard[curRow][col].filled {
+            wordAtMoment = String(gameboard[curRow][col].tile!.letter) + wordAtMoment
+            wordAtMoment = wordAtMoment.lowercaseString
+            curRow -= 1
+        }
+        
+        //append to below the placed letter
+        curRow = row + 1
+        while curRow < numRowsOrCols && gameboard[curRow][col].filled {
+            wordAtMoment += String(gameboard[curRow][col].tile!.letter)
+            wordAtMoment = wordAtMoment.lowercaseString
+            curRow += 1
+        }
+        return wordAtMoment
     }
+    
 
     /**
      This takes in current row and current column that the
@@ -215,15 +241,13 @@ class GameboardModel {
      current row if the spelling is correct.
      */
     func getHorizontalWord(row : Int, col : Int) -> String {
-        /**
-         This takes in current row and current column that the
-         placed tile is on and will check the
-         current row if the spelling is correct.
-         */
+        if !gameboard[row][col].filled {
+            return ""
+        }
         var wordAtMoment:String = ""
         var curCol = col
         
-        //append to left side of word
+        //append to left side of placed letter
         while curCol >= 0 && gameboard[row][curCol].filled {
             wordAtMoment = String(gameboard[row][curCol].tile!.letter) + wordAtMoment
             wordAtMoment = wordAtMoment.lowercaseString
@@ -231,7 +255,7 @@ class GameboardModel {
             print ("Word at moment \(wordAtMoment)")
         }
         
-        //append to right side of word
+        //append to right side of placed letter
         curCol = col + 1
         while curCol < numRowsOrCols && gameboard[row][curCol].filled {
             wordAtMoment += String(gameboard[row][curCol].tile!.letter)
