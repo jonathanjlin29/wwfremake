@@ -13,21 +13,15 @@ import Foundation
  board square that has a special functionality, like skipping 
  a player's turn, or multiplying point values of word or letter
 */
-class SpecialSquare: AbstractBoardSquare {
-    var value:Int
-    var filled:Bool
-    var tile:Tile?
-    var state:SquareState
+class SpecialSquare: NormalSquare {
     
-    init() {
-        value = 0
-        filled = false
-        tile = nil
-        state = .Empty
-    }
-    
-    func setTile(t : Tile) {
-        
+    override init(row: Int, column: Int) {
+        super.init(row: row, column: column)
+        self.value = 0
+        self.filled = false
+        self.tile = nil
+        self.state = .Empty
+        self.isSpecial = true
     }
     
 }

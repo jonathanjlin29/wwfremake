@@ -9,12 +9,18 @@
 import Foundation
 
 class Player {
-    var numPoints:Int
-    var tilesLeft:Array<Tile>
+    var tiles:Array<Tile>
+    var score:Int
+    var playerNumber:Int
+
+    init(playerNumber : Int) {
+        self.playerNumber = playerNumber
+        self.tiles = Array<Tile>()
+        self.score = 0
+    }
     
-    init() {
-        self.numPoints = 0
-        tilesLeft = Array<Tile>()
+    func addScore(points : Int) {
+        score += points
     }
     
 }

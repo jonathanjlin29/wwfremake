@@ -10,12 +10,12 @@ import XCTest
 
 @testable import Extreme_WWF
 
-class GameboardModelSpelling: XCTestCase {
+class GameboardModelSpellingTests: XCTestCase {
     
     var gameboard:GameboardModel?
     
     override func setUp() {
-        gameboard = GameboardModel(GameboardSize: 15)
+        gameboard = GameboardModel(GameboardSize: 15, tileCollection: TileCollection())
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -51,15 +51,6 @@ class GameboardModelSpelling: XCTestCase {
         activeTilesHorizontal.append((row: 0, col : 4))
         XCTAssert(gameboard!.isInStraightLine(activeTilesHorizontal).horizontal)
         XCTAssertFalse(gameboard!.isInStraightLine(activeTilesHorizontal).vertical)
-        
-        var activeTilesDiagonalWrong = Array<(row: Int, col: Int)>()
-        activeTiles.append((row: 0, col : 0))
-        activeTiles.append((row: 1, col : 1))
-        activeTiles.append((row: 2, col : 2))
-        activeTiles.append((row: 3, col : 3))
-        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).horizontal)
-        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).vertical)
-        
         var random = Array<(row: Int, col: Int)>()
         random.append((row:5, col : 4))
         random.append((row:2, col : 4))
@@ -70,6 +61,16 @@ class GameboardModelSpelling: XCTestCase {
         XCTAssertFalse(gameboard!.isInStraightLine(random).vertical
         )
         
+    }
+    
+    func testFalseResultsForIsInStraightLine() {
+        var activeTilesDiagonalWrong = Array<(row: Int, col: Int)>()
+        activeTilesDiagonalWrong.append((row: 0, col : 0))
+        activeTilesDiagonalWrong.append((row: 1, col : 1))
+        activeTilesDiagonalWrong.append((row: 2, col : 2))
+        activeTilesDiagonalWrong.append((row: 3, col : 3))
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).horizontal)
+        XCTAssertFalse(gameboard!.isInStraightLine(activeTilesDiagonalWrong).vertical)
     }
     
     func testHorizontalSpelling() {
@@ -162,6 +163,17 @@ class GameboardModelSpelling: XCTestCase {
 //        XCTAssertEqual(results_t[0], "string")
 //        XCTAssertEqual(results_t[1], "string")
     }
+    
+    
+    
+    func testIsSpellingCorrect() {
+        XCTAssertTrue(gameboard!.isSpellingCorrect("spell"))
+        XCTAssertTrue(gameboard!.isSpellingCorrect("a"))
+        XCTAssertTrue(gameboard!.isSpellingCorrect("this"))
+        XCTAssertFalse(gameboard!.isSpellingCorrect("sadfas"))
+        XCTAssertFalse(gameboard!.isSpellingCorrect("snodsl"))
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {

@@ -42,6 +42,10 @@ class TileCollection {
     var numOfEachLetter = [Character:Int]()
     
     
+    func hasNextTile () -> Bool {
+        return allTiles.count != 0
+    }
+    
     func getnextTile () -> Tile? {
         if allTiles.count > 0 {
             return allTiles.popLast()
@@ -52,7 +56,7 @@ class TileCollection {
     init() {
         allTiles = Array<Tile>()
         self.resetWithNewTiles()
-        
+        print("allTiles size \(allTiles.count)")
     }
     
     /**
@@ -75,16 +79,7 @@ class TileCollection {
         for _ in 1..<time {
             allTiles = allTiles.shuffle()
         }
-        
         return allTiles
     }
-    
-    //This function takes in a letter,
-    //and returns an SKSpriteNode that represents that letter
-    func getTileNode(letter : Character) -> TileSpriteNode {
-        let squareTexture = SKTexture(imageNamed: "square_" + String(letter).uppercaseString)
-        let square = TileSpriteNode(texture: squareTexture, tilePos: nil)
-        square.setLetter(letter)
-        return square
-    }
+
 }

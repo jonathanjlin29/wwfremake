@@ -13,20 +13,25 @@ import SpriteKit
 class Tile {
     var letter:Character
     var pointValue:Int
+    var row:Int?
+    var col:Int?
+    var positionOnRack:Int?
+    var onBoardOrTileRack:BoardOrTileRack
     
+
     init(curLet: Character) {
         self.letter = curLet
+        self.onBoardOrTileRack = .TileRack
         self.pointValue = TileDictionary.getLetterValue(curLet)
-        
     }
     
-    func getLetter() -> Character {
-        return letter
-    }
-
     
-    func getPointValue() -> Int  {
-        return pointValue
+    func setOnRack(position: Int) {
+        self.row = nil
+        self.col = nil
+        self.positionOnRack = position
     }
+    
+    
     
 }
