@@ -23,4 +23,17 @@ class Player {
         score += points
     }
     
+    func replaceBlankTile(col : Int, row : Int, tile : Tile) {
+        var indexOfBlank = 0
+        for (ndx,each) in tiles.enumerate() {
+            if each.row != nil && each.row == row {
+                if each.col != nil && each.col == col {
+                    indexOfBlank = ndx
+                }
+            }
+        }
+        tiles.removeAtIndex(indexOfBlank)
+        tiles.append(tile)
+    }
+    
 }

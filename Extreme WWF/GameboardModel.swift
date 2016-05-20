@@ -53,7 +53,8 @@ class GameboardModel {
         for row in 0..<GameboardSize {
              var newGameboard = [NormalSquare]()
             for col in 0..<GameboardSize {
-                newGameboard.append(NormalSquare(row: row, column: col))
+                newGameboard.append(NormalSquare(row: row, column: col,
+                    special: SquareTextureGetter().isSpecialSquare(col, row: row)))
             }
             self.gameboard.append(newGameboard)
         }
@@ -75,9 +76,7 @@ class GameboardModel {
         let player = Player(playerNumber: curPlayer + 1)
         curPlayer += 1
         for _ in 1...7 {
-            print("For loop entered")
             if tileCollection.hasNextTile() {
-                print("has tiles")
                 player.tiles.append(tileCollection.getnextTile()!)
             }
         }
@@ -162,7 +161,8 @@ class GameboardModel {
      */
     func getPointValue(activeTiles : Array<Tile>) -> Int {
         let activeTilePlacements = convertToActiveTiles(activeTiles)
-        let spellings = getAllSpellings(activeTilePlacements)
+        let whichWay = isInStraightLine(activeTilePlacements)
+        let spellings = getAllSpellings(activeTilePlacements, whichWay: whichWay)
         var pointValue = 0
         for (key, val) in spellings {
             if isSpellingCorrect(key) {
@@ -171,49 +171,53 @@ class GameboardModel {
         }
         return pointValue
     }
-
+    
+    func printSpellings(spellings: [String: Int] ){
+        print("******THE SPELLINGS ARE ******")
+        for (each, _) in spellings {
+            print(each)
+        }
+        print("******End of SPELLINGS *******")
+    }
+    
     /**
      Returns the spellings and their total points that were made by the currently active tiles.
      If the word was spelled multiple times, then the total points is the sum of those times.
      */
-    func getAllSpellings(activeTiles: Array<(row: Int, col: Int)>) -> [String: Int] {
+    func getAllSpellings(activeTiles: Array<(row: Int, col: Int)>, whichWay: (vertical: Bool, horizontal: Bool)) -> [String: Int] {
         var spellings = Dictionary<String, Int>()
-        let whichWay = isInStraightLine(activeTiles)
+        
         if whichWay.horizontal {
             for each in activeTiles {
                 let vertWord = getVerticalWord(each.row, col: each.col)
-                if vertWord.word.characters.count > 1 {
-                    if spellings[vertWord.word] == nil {
-                        spellings[vertWord.word] = 0
-                    }
-                    spellings[vertWord.word]! += vertWord.points
+                if spellings[vertWord.word] == nil {
+                   spellings[vertWord.word] = vertWord.points
                 }
+//                spellings[vertWord.word]! += vertWord.points
             }
             let horizWord = getHorizontalWord(activeTiles[0].row, col: activeTiles[0].col)
             if spellings[horizWord.word] == nil {
-                spellings[horizWord.word] = 0
+                spellings[horizWord.word] =  horizWord.points
             }
-            spellings[horizWord.word]! += horizWord.points
+//            spellings[horizWord.word]! += horizWord.points
         }
         
         if whichWay.vertical {
             for each in activeTiles {
                 let horizWord = getHorizontalWord(each.row, col: each.col)
-                if horizWord.word.characters.count > 1 {
                     if spellings[horizWord.word] == nil {
-                        spellings[horizWord.word] = 0
+                        spellings[horizWord.word] = horizWord.points//0
                     }
-                    spellings[horizWord.word]! += horizWord.points
-                }
+//                    spellings[horizWord.word]! += horizWord.points
             }
             let vertWord = getVerticalWord(activeTiles[0].row, col: activeTiles[0].col)
             if spellings[vertWord.word] == nil {
-                spellings[vertWord.word] = 0
+                spellings[vertWord.word] = vertWord.points
             }
-            spellings[vertWord.word]! += vertWord.points
+//            spellings[vertWord.word]! += vertWord.points
             
         }
-        
+        printSpellings(spellings)
         return spellings
     }
     
@@ -246,12 +250,11 @@ class GameboardModel {
         let straight = isInStraightLine(activeTilePlacements)
         let verticalStraight = straight.vertical
         let horizontalStraight = straight.horizontal
-        print("Vertical straight \(verticalStraight)")
-        print("Horizontal straight \(horizontalStraight)")
         
-        let spellings = getAllSpellings(activeTilePlacements)
+        let spellings = getAllSpellings(activeTilePlacements,whichWay: straight)
         for (key, _) in spellings {
             if !isSpellingCorrect(key) {
+                print("\(key) is This is not a valid spelling")
                 return false
             }
         }
@@ -260,59 +263,92 @@ class GameboardModel {
         
     }
     
+    func findMinMaxRow(activeTiles: Array<(row: Int, col: Int)>) -> (min: Int, max: Int) {
+        var minRow = activeTiles[0].row
+        var maxRow = activeTiles[0].row
+        for each in activeTiles {
+            if each.row < minRow {
+                minRow = each.row
+            }
+            if each.row > maxRow {
+                maxRow = each.row
+            }
+        }
+        return (min: minRow, max: maxRow)
+    }
+
+    func findMinMaxCol(activeTiles: Array<(row: Int, col: Int)>) -> (min: Int, max: Int) {
+        var minCol = activeTiles[0].col
+        var maxCol = activeTiles[0].col
+        for each in activeTiles {
+            if each.col < minCol {
+                minCol = each.col
+            }
+            if each.col > maxCol {
+                maxCol = each.col
+            }
+        }
+        return (min: minCol, max: maxCol)
+    }
+    
     /**
      Checks if the move is valid: Words are spelled straight.
      */
     func isInStraightLine(activeTiles: Array<(row: Int, col: Int)>) ->
         (vertical: Bool, horizontal: Bool) {
         if activeTiles.count == 0 {
-            print("No tile is placed here.")
             return (vertical: false, horizontal: false)
         }
-
-        var tilesInOrder = activeTiles.sort({ (one, two) -> Bool in
-            if one.row < two.row {
-                return true
-            }
-            else if one.row == two.row {
-                if one.col < two.col {
-                    return true
-                }
-                else {
-                    return false
-                }
-            }
-            
-            return false
-        })
         
         var vertically  = true
         var horizontally = true
             
         //check if they are not vertical or horizontal
-        for each in tilesInOrder {
-            horizontally = each.row != activeTiles[0].row ?  false : true
-            vertically = each.col != activeTiles[0].col ?  false : true
+        for each in activeTiles {
+            if each.row != activeTiles[0].row {
+                horizontally = false
+            }
+            if each.col != activeTiles[0].col {
+                vertically = false
+            }
         }
         
-        var compare = tilesInOrder[0]
-        for each in 1..<tilesInOrder.count {
-            if vertically && tilesInOrder[each].row != compare.row + 1 {
-                return (vertical: false, horizontal: false)
-            }
-            if horizontally && tilesInOrder[each].col != compare.col + 1 {
-                return (vertical: false, horizontal: false)
-            }
-            compare = tilesInOrder[each]
-        }
-    
         if !vertically && !horizontally {
-            print("neither vertical nor horizontal")
             return (vertical: false, horizontal: false)
+        }
+            
+        if vertically {
+            let minMax = findMinMaxRow(activeTiles)
+            vertically = areVerticalTilesPlayable(minMax.min, endRow: minMax.max, col: activeTiles[0].col)
+        }
+        else if horizontally {
+            let minMax = findMinMaxCol(activeTiles)
+            horizontally = areHorizontalTilesPlayable(minMax.min, endCol: minMax.max, row: activeTiles[0].row)
         }
         
         return (vertical: vertically, horizontal: horizontally)
         
+    }
+    
+    
+    func areHorizontalTilesPlayable(startCol: Int, endCol: Int, row: Int) -> Bool {
+        
+        for curCol in startCol...endCol {
+            if !gameboard[row][curCol].filled {
+                return false
+            }
+        }
+        return true
+    }
+    
+    
+    func areVerticalTilesPlayable(startRow: Int, endRow: Int, col: Int) -> Bool {
+        for curRow in startRow...endRow {
+            if !gameboard[curRow][col].filled {
+                return false
+            }
+        }
+        return true
     }
     
     
@@ -323,6 +359,18 @@ class GameboardModel {
             }
         }
         return false
+    }
+    
+    
+    
+    /**
+     This function sets all the board squares states that are played at to .Final.
+     */
+    func finalizeBoardSquareState(activeTiles: Array<(row: Int, col: Int)>) {
+        for each in activeTiles {
+            gameboard[each.row][each.col].state = .Final
+        }
+        
     }
     
     /**
@@ -337,33 +385,89 @@ class GameboardModel {
      spell a word.
      */
     func playMove(player : Player) -> Player {
+        
         if !isValidMove(player.tiles) {
+            print("Was not valid move")
             return player
         }
+        
         isFirstMove = false
         var newTiles = 0
         let pointValues = getPointValue(player.tiles)
-        for (ndx,each) in player.tiles.enumerate() {
+        var newSetOfTiles = Array<Tile>()
+        for each in player.tiles {
             ///if it is played on the board. Then we want to get rid of it
             if each.row != nil && each.col != nil {
                 gameboard[each.row!][each.col!].state = .Final
-                player.tiles.removeAtIndex(ndx)
                 newTiles += 1
-                //give back tiles to the player
             }
-        }
-        for _ in 0..<newTiles {
-            if tileCollection.hasNextTile() {
-                player.tiles.append(tileCollection.getnextTile()!)
+            
+            if each.onBoardOrTileRack == .TileRack {
+                newSetOfTiles.append(each)
+                
             }
         }
         
+        print("Number of new tiles neeeded \(newTiles)")
+        for _ in 0..<newTiles {
+            if tileCollection.hasNextTile() {
+                newSetOfTiles.append(tileCollection.getnextTile()!)
+            }
+        }
+        
+        player.tiles = newSetOfTiles
         player.score += pointValues
         return player
     }
-    
-    
 
+    
+    func multiplyLetter(square : NormalSquare) -> Int {
+        if square.state == .Placed {
+            switch (square.specialSquare) {
+            case .DL:
+                return square.value * 2
+            case .TL:
+                return square.value * 3
+            default:
+                return square.value
+            }
+        }
+        
+        return square.value
+    }
+    
+    /**
+     Tuple returned is same if it is not a triple word or double word.
+     TUple returned is (true, TW||DW) if it is a tw or dw.
+     */
+    func multiplyWordChain(square : NormalSquare, tuple : [(Bool, SpecialSquare)]) -> [(Bool, SpecialSquare)] {
+        var tuple1 = tuple
+        if square.state == .Placed {
+            if square.specialSquare == .TW {
+                tuple1.append((true, SpecialSquare.TW))
+            }
+            if square.specialSquare == .DW {
+                tuple1.append((true, SpecialSquare.DW))
+            }
+        }
+        return tuple1
+    }
+    
+    func multiplyWordScore(points: Int, multipliers: [(Bool, SpecialSquare)]) -> Int {
+        var curPoints = points
+        for each in multipliers {
+            if each.0 == true {
+                if each.1 == .TW {
+                    curPoints *= 3
+                }
+                if each.1 == .DW {
+                    curPoints *= 2
+                }
+            }
+        }
+        return curPoints
+    }
+    
     /**
      This takes in current row and current column that the
      placed tile is on and will check the
@@ -373,16 +477,17 @@ class GameboardModel {
         if !gameboard[row][col].filled {
             return (word: "", points: 0)
         }
-
+        
         var wordAtMoment:String = ""
         var curRow = row
         var curPoints = 0
-        
+        var multiplierWordChain = [(false, SpecialSquare.Normal)]
         //append to above the placed letter
         while curRow >= 0 && gameboard[curRow][col].filled {
             wordAtMoment = String(gameboard[curRow][col].tile!.letter) + wordAtMoment
             wordAtMoment = wordAtMoment.lowercaseString
-            curPoints += gameboard[curRow][col].value
+            curPoints += multiplyLetter(gameboard[curRow][col])
+            multiplierWordChain = multiplyWordChain(gameboard[curRow][col], tuple : multiplierWordChain)
             curRow -= 1
         }
         
@@ -391,10 +496,15 @@ class GameboardModel {
         while curRow < numRowsOrCols && gameboard[curRow][col].filled {
             wordAtMoment += String(gameboard[curRow][col].tile!.letter)
             wordAtMoment = wordAtMoment.lowercaseString
-            curPoints += gameboard[curRow][col].value
+            curPoints += multiplyLetter(gameboard[curRow][col])
+            multiplierWordChain = multiplyWordChain(gameboard[curRow][col], tuple: multiplierWordChain)
             curRow += 1
         }
-        
+        if wordAtMoment.characters.count <= 1 {
+            print("word vertically is too small to be added for points")
+            return (word: "", points: 0)
+        }
+        curPoints = multiplyWordScore(curPoints, multipliers: multiplierWordChain)
         return (word: wordAtMoment, points: curPoints)
     }
     
@@ -411,12 +521,15 @@ class GameboardModel {
         var wordAtMoment:String = ""
         var curCol = col
         var curPoints = 0
-        
+        var multiplierWordChain = [(false, SpecialSquare.Normal)]
+
         //append to left side of placed letter
         while curCol >= 0 && gameboard[row][curCol].filled {
             wordAtMoment = String(gameboard[row][curCol].tile!.letter) + wordAtMoment
             wordAtMoment = wordAtMoment.lowercaseString
-            curPoints += gameboard[row][curCol].value
+            curPoints += multiplyLetter(gameboard[row][curCol])
+            multiplierWordChain = multiplyWordChain(gameboard[row][curCol], tuple: multiplierWordChain)
+
             curCol -= 1
         }
         
@@ -425,9 +538,16 @@ class GameboardModel {
         while curCol < numRowsOrCols && gameboard[row][curCol].filled {
             wordAtMoment += String(gameboard[row][curCol].tile!.letter)
             wordAtMoment = wordAtMoment.lowercaseString
-            curPoints += gameboard[row][curCol].value
+            curPoints += multiplyLetter(gameboard[row][curCol])
+            multiplierWordChain = multiplyWordChain(gameboard[row][curCol], tuple: multiplierWordChain)
             curCol += 1
         }
+        
+        if wordAtMoment.characters.count <= 1 {
+            print("word vertically is too small to be added for points")
+            return (word: "", points: 0)
+        }
+        curPoints = multiplyWordScore(curPoints, multipliers: multiplierWordChain)
         return (word: wordAtMoment, points: curPoints)
     }
     

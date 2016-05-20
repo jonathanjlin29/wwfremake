@@ -10,11 +10,11 @@
 		2002080A1CC09ACC00AE6794 /* TileRackPositionSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200208091CC09ACC00AE6794 /* TileRackPositionSpriteNode.swift */; };
 		2024C58D1CD2DD430098B707 /* GameboardModelBoardStatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2024C58C1CD2DD430098B707 /* GameboardModelBoardStatesTests.swift */; };
 		202CB5241CE3C2D500453E8E /* TileCollectionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202CB5231CE3C2D500453E8E /* TileCollectionTest.swift */; };
+		202CB5261CE4453C00453E8E /* SquareTextureGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202CB5251CE4453C00453E8E /* SquareTextureGetter.swift */; };
 		204D14A11C92772800903B37 /* SquarePlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204D14A01C92772800903B37 /* SquarePlacement.swift */; };
 		205091711C5EDB9300FC18C0 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091701C5EDB9300FC18C0 /* Tile.swift */; };
 		205091771C5EDD4500FC18C0 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091761C5EDD4500FC18C0 /* Player.swift */; };
 		205091791C5EDE5300FC18C0 /* Scoreboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091781C5EDE5300FC18C0 /* Scoreboard.swift */; };
-		2050917B1C5EDF0900FC18C0 /* SpecialSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2050917A1C5EDF0900FC18C0 /* SpecialSquare.swift */; };
 		205BF4221C9CC3CC00D63CAF /* SquareState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205BF4211C9CC3CC00D63CAF /* SquareState.swift */; };
 		20608DEF1C5DCC6800E01D12 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */; };
 		20608DF31C5DCC6800E01D12 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DF21C5DCC6800E01D12 /* GameScene.swift */; };
@@ -25,6 +25,7 @@
 		20608E141C5DD27800E01D12 /* GameboardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E131C5DD27800E01D12 /* GameboardModel.swift */; };
 		20608E171C5DD35500E01D12 /* AbstractBoardSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */; };
 		20608E191C5EBAEB00E01D12 /* NormalSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608E181C5EBAEB00E01D12 /* NormalSquare.swift */; };
+		2064BD1B1CEF985500743866 /* SpecialSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2064BD1A1CEF985500743866 /* SpecialSquare.swift */; };
 		2082108A1C6D7AA6009FB972 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208210891C6D7AA6009FB972 /* GameViewController.swift */; };
 		2082108C1C6D7AFD009FB972 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2082108B1C6D7AFD009FB972 /* GameScene.sks */; };
 		20A3DDB21CB5EAD70074D3E7 /* TileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A3DDB11CB5EAD70074D3E7 /* TileSpriteNode.swift */; };
@@ -48,11 +49,11 @@
 		200208091CC09ACC00AE6794 /* TileRackPositionSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileRackPositionSpriteNode.swift; sourceTree = "<group>"; };
 		2024C58C1CD2DD430098B707 /* GameboardModelBoardStatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameboardModelBoardStatesTests.swift; sourceTree = "<group>"; };
 		202CB5231CE3C2D500453E8E /* TileCollectionTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileCollectionTest.swift; sourceTree = "<group>"; };
+		202CB5251CE4453C00453E8E /* SquareTextureGetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquareTextureGetter.swift; sourceTree = "<group>"; };
 		204D14A01C92772800903B37 /* SquarePlacement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquarePlacement.swift; sourceTree = "<group>"; };
 		205091701C5EDB9300FC18C0 /* Tile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		205091761C5EDD4500FC18C0 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		205091781C5EDE5300FC18C0 /* Scoreboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scoreboard.swift; sourceTree = "<group>"; };
-		2050917A1C5EDF0900FC18C0 /* SpecialSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpecialSquare.swift; sourceTree = "<group>"; };
 		205BF4211C9CC3CC00D63CAF /* SquareState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquareState.swift; sourceTree = "<group>"; };
 		20608DEB1C5DCC6800E01D12 /* Extreme WWF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Extreme WWF.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -67,6 +68,7 @@
 		20608E131C5DD27800E01D12 /* GameboardModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameboardModel.swift; sourceTree = "<group>"; };
 		20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractBoardSquare.swift; sourceTree = "<group>"; };
 		20608E181C5EBAEB00E01D12 /* NormalSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalSquare.swift; sourceTree = "<group>"; };
+		2064BD1A1CEF985500743866 /* SpecialSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpecialSquare.swift; sourceTree = "<group>"; };
 		208210891C6D7AA6009FB972 /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		2082108B1C6D7AFD009FB972 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		20A3DDB11CB5EAD70074D3E7 /* TileSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileSpriteNode.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				20A3DDB11CB5EAD70074D3E7 /* TileSpriteNode.swift */,
 				20A3DDB31CB5F2420074D3E7 /* BoardSquareSpriteNode.swift */,
 				200208091CC09ACC00AE6794 /* TileRackPositionSpriteNode.swift */,
+				202CB5251CE4453C00453E8E /* SquareTextureGetter.swift */,
 			);
 			name = view;
 			sourceTree = "<group>";
@@ -128,9 +131,9 @@
 			isa = PBXGroup;
 			children = (
 				20608E181C5EBAEB00E01D12 /* NormalSquare.swift */,
-				2050917A1C5EDF0900FC18C0 /* SpecialSquare.swift */,
 				205BF4211C9CC3CC00D63CAF /* SquareState.swift */,
 				20608E161C5DD35500E01D12 /* AbstractBoardSquare.swift */,
+				2064BD1A1CEF985500743866 /* SpecialSquare.swift */,
 			);
 			name = BoardSquares;
 			sourceTree = "<group>";
@@ -329,12 +332,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				202CB5261CE4453C00453E8E /* SquareTextureGetter.swift in Sources */,
 				2002080A1CC09ACC00AE6794 /* TileRackPositionSpriteNode.swift in Sources */,
 				20608DF31C5DCC6800E01D12 /* GameScene.swift in Sources */,
 				20608E191C5EBAEB00E01D12 /* NormalSquare.swift in Sources */,
 				20608E171C5DD35500E01D12 /* AbstractBoardSquare.swift in Sources */,
 				20A3DDB21CB5EAD70074D3E7 /* TileSpriteNode.swift in Sources */,
-				2050917B1C5EDF0900FC18C0 /* SpecialSquare.swift in Sources */,
 				205091711C5EDB9300FC18C0 /* Tile.swift in Sources */,
 				20B6F3CB1C653B04007A0E72 /* TileDictionary.swift in Sources */,
 				20608E141C5DD27800E01D12 /* GameboardModel.swift in Sources */,
@@ -342,6 +345,7 @@
 				205BF4221C9CC3CC00D63CAF /* SquareState.swift in Sources */,
 				2082108A1C6D7AA6009FB972 /* GameViewController.swift in Sources */,
 				20A3DDB41CB5F2420074D3E7 /* BoardSquareSpriteNode.swift in Sources */,
+				2064BD1B1CEF985500743866 /* SpecialSquare.swift in Sources */,
 				20B6F3C71C6530D2007A0E72 /* TileCollection.swift in Sources */,
 				205091771C5EDD4500FC18C0 /* Player.swift in Sources */,
 				20AFB8241CD3F4B700B2F55B /* BoardOrTileRack.swift in Sources */,

@@ -37,6 +37,10 @@ class GameViewController: UIViewController {
         }
     }
     
+    @IBAction func skipMove(sender: UIBarButtonItem) {
+        scene.skipMove()
+    }
+    
     @IBAction func playMove(sender: UIBarButtonItem) {
         scene.playMove()
     }

@@ -107,16 +107,30 @@ class GameboardModelBoardStatesTests: XCTestCase {
         let tile3 = Tile(curLet: "e")
         let tile4 = Tile(curLet: "l")
         let tile5 = Tile(curLet: "l")
+        let tile6 = Tile(curLet: "e")
+        let tile7 = Tile(curLet: "d")
         player.tiles.append(tile1)
         player.tiles.append(tile2)
         player.tiles.append(tile3)
         player.tiles.append(tile4)
         player.tiles.append(tile5)
-        gbModel.setBoardSquareState(10, col: 10, tile: tile1)
-        gbModel.setBoardSquareState(11, col: 10, tile: tile2)
-        gbModel.setBoardSquareState(12, col: 10, tile: tile3)
-        gbModel.setBoardSquareState(13, col: 10, tile: tile4)
-        gbModel.setBoardSquareState(14, col: 10, tile: tile5)
+        gbModel.setBoardSquareState(7, col: 10, tile: tile1)
+        gbModel.setBoardSquareState(8, col: 10, tile: tile2)
+        gbModel.setBoardSquareState(9, col: 10, tile: tile3)
+        gbModel.setBoardSquareState(10, col: 10, tile: tile4)
+        gbModel.setBoardSquareState(11, col: 10, tile: tile5)
+        let prevScore = player.score
+        gbModel.playMove(player)
+        let newScore = player.score
+        XCTAssertTrue(newScore > prevScore)
+        gbModel.setBoardSquareState(12, col: 10, tile: tile6)
+        gbModel.setBoardSquareState(13, col: 10, tile: tile7)
+        let beforeSpelled = player.score
+        gbModel.playMove(player)
+        let afterSpelled = player.score
+        
+        XCTAssertTrue(afterSpelled > beforeSpelled)
+        
     }
     
     

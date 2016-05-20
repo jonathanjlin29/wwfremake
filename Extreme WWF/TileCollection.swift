@@ -59,6 +59,8 @@ class TileCollection {
         print("allTiles size \(allTiles.count)")
     }
     
+    
+    
     /**
     This function refreshes and creates the tile collection with
     default values. Should only be called once at the beginning
@@ -70,7 +72,7 @@ class TileCollection {
         var tilesGenerated = Array<Tile>();
         
         for (letter, numTiles) in TileDictionary.getNumTimesOfLetter() {
-            for _ in 1...numTiles {
+            for _ in 0..<numTiles {
             tilesGenerated.append(Tile(curLet: letter))
             }
         }

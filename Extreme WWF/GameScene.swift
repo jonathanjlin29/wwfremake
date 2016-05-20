@@ -29,10 +29,15 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
     
     var currentPlayer:Player?
     
-    var player1Tiles:Array<TileSpriteNode> = Array<TileSpriteNode>()
+    var blankTileValue:Character = "A"
     
-    var player2Tiles:Array<TileSpriteNode> = Array<TileSpriteNode>()
+    var skipCounter:Int = 0
     
+    var gameIsOver:Bool = false
+    
+//    var player1Tiles:Array<TileSpriteNode> = Array<TileSpriteNode>()
+//    
+//    var player2Tiles:Array<TileSpriteNode> = Array<TileSpriteNode>()
     
     /**
      This is the list of of player 1's tile views.
@@ -119,10 +124,8 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         currentPlayer = player1
         initGame()
         initDrawBoard()
-        player1Tiles = initPlayersTiles(player1)
-        curPlayersTiles = player1Tiles
+        curPlayersTiles = initPlayersTiles(player1)
         drawScoreForPlayer(player1, minX: CGFloat(0), minY : startY() + boardSquareWidth())
-
     }
     
 
@@ -138,7 +141,7 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
 //     This is the logic for drawing one board square on the board.... Depends on position.
 //     */
     func drawBoardSquare(column: Int, row: Int) -> BoardSquareSpriteNode {
-        let squareTexture = SKTexture(imageNamed: "empty_scrabble_square")
+        let squareTexture = SquareTextureGetter().getTexture(column, row: row)
         let absPosX = CGFloat(column) * boardSquareWidth()
         let absPosY = CGFloat(row) * boardSquareWidth()
         let xPosition = startX() + absPosX
@@ -153,6 +156,7 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         self.addChild(square)
         return square
     }
+
 
     /**
      This functions draws the initial empty board of board squares
@@ -245,15 +249,14 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
             /**This puts it above the tile rack.**/
             tile.zPosition = 1
             
-            print("Tiles should be drawn")
             tile.tile.setOnRack(ndx)
             self.addChild(tile)
         }
     }
     
     
-    func updateImageScore() {
-        
+    func updateImageScore(scoreLabel: SKLabelNode, player: Player) {
+        scoreLabel.text = "Player \(player.playerNumber) Score: \(player.score)"
     }
     
     func drawScoreForPlayer(player : Player, minX: CGFloat, minY : CGFloat) {
@@ -262,44 +265,60 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         //player 2 will take up the other half.
         let background = CGRect(x: minX, y: minY, width: bounds.size.width/CGFloat(2), height: tileSquareWidth())
         let rect = SKShapeNode(rect: background)
-        rect.name = "scoreBackground"
+        rect.name = "scoreBackground1"
         rect.fillColor = SKColor.blackColor()
         rect.zPosition = 2
-    
-        player1ScoreLabel = SKLabelNode()
-//        player1ScoreLabel.position = CGPoint(x: minX + bounds.size.width/CGFloat(4), y: minY + tileSquareWidth()/CGFloat(2))
+        let background2 = CGRect(x: minX + bounds.size.width/CGFloat(2), y: minY, width: bounds.size.width/CGFloat(2), height: tileSquareWidth())
+        let rect2 = SKShapeNode(rect: background2)
+        rect2.name = "scoreBackground2"
+        rect2.fillColor = SKColor.blackColor()
+        rect2.zPosition = 2
+        self.addChild(rect)
+        self.addChild(rect2)
+        
+        player1ScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         player1ScoreLabel.position = CGPoint(x: bounds.size.width/CGFloat(4), y: minY + (tileSquareWidth()/CGFloat(2)))
-
-        player1ScoreLabel.text = "    Player 1 Score : \(player.score) "
-        player1ScoreLabel.fontSize = CGFloat(25.0)
+        player1ScoreLabel.fontSize = CGFloat(20.0)
         player1ScoreLabel.fontColor = SKColor.whiteColor()
         player1ScoreLabel.zPosition = 4
+        updateImageScore(player1ScoreLabel, player: player1)
+
+        
+        player2ScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+        player2ScoreLabel.position = CGPoint(x: 3 * bounds.size.width/CGFloat(4), y: minY + (tileSquareWidth()/CGFloat(2)))
+        player2ScoreLabel.fontSize = CGFloat(20.0)
+        player2ScoreLabel.fontColor = SKColor.whiteColor()
+        player2ScoreLabel.zPosition = 4
+        updateImageScore(player2ScoreLabel, player: player2)
+
+        
         self.addChild(player1ScoreLabel)
-        self.addChild(rect)
+        self.addChild(player2ScoreLabel)
+
     }
     
     /**
      This will reset the tiles back to the players positions.
      */
     func resetTiles() {
-        
-        //This visually replaces the tiles visually 
+        //This visually replaces the tiles visually
         //and also reset the board squares that the tiles
         //were on.
         for (ndx, each) in curPlayersTiles.shuffle().enumerate() {
             let sks = each
+            //model components
+            setBoardToMatchTile(sks.tile, state: SquareState.Empty)
+            tileRack[ndx].setFilled(.Filled)
+            sks.tile.positionOnRack = ndx
             //visual components
             sks.position = tileRack[ndx].position
             sks.size = tileSquareSize()
             
-            //model components
-            tileRack[ndx].setFilled(.Filled)
-            sks.tile.setOnRack(ndx)
+
         }
         
         //This resets the board to match the tiles in the players hands.
         for tile in currentPlayer!.tiles {
-            setBoardToMatchTile(tile, state: SquareState.Empty)
             tile.col = nil
             tile.row = nil
             
@@ -317,10 +336,12 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
                 gameboardModel.gameboard[row][col].state = state
                 if state == .Empty {
                    gameboardModel.gameboard[row][col].clearSquare()
+                    print("(\(row), \(col)) is now empty")
                 }
             }
         }
     }
+    
     /**
      This draws 7 tile rack positions for the user to drop their tiles back from play.
      */
@@ -350,9 +371,8 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         return String(TileDictionary.getDictionary()[row])
     }
     
-    
     func provideFeedback(message : String) {
-        let title = "Play Move Pressed"
+        let title = "Play Move"
         let okText = "OK"
         let alert = UIAlertController(title: title, message: message,
                                       preferredStyle: UIAlertControllerStyle.Alert)
@@ -362,12 +382,96 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
 
     }
     
-    func playMove() {
+    
+    func hideNonPlayedTiles(playersTiles : Array<TileSpriteNode>) {
+        for each in playersTiles {
+            
+            if each.tile.onBoardOrTileRack == .TileRack {
+                print("The tile is removed")
+                each.removeFromParent()
+            }
+        }
+        var tiles = playersTiles
+        tiles.removeAll()
+
         
     }
     
-
+    func changeTurns() {
+        let playerNumber =  currentPlayer!.playerNumber
+        hideNonPlayedTiles(curPlayersTiles)
+        if playerNumber == player1.playerNumber {
+            updateImageScore(player1ScoreLabel, player: currentPlayer!)
+            currentPlayer = player2
+        }
+        else if playerNumber == player2.playerNumber {
+            updateImageScore(player2ScoreLabel, player: currentPlayer!)
+            currentPlayer = player1
+            
+        }
+        curPlayersTiles = initPlayersTiles(currentPlayer!)
+    }
     
+    
+    func skipMove() {
+        skipCounter += 1
+        if skipCounter == 3 {
+            print("skip counter = \(skipCounter)")
+            endGame()
+        }
+        else {
+            provideFeedback("You have skipped your turn.")
+            changeTurns()
+
+        }
+    }
+    
+    
+    func endGame() {
+        var message = ""
+        gameIsOver = true
+        if player1.score > player2.score {
+            message = "Player 1 won with \(player1.score) points!"
+        }
+        else if player2.score > player1.score {
+            message = "Player 2 won with \(player2.score) points!"
+        }
+        else {
+            message = "Player 1 and 2 tied with \(player2.score) points!"
+        }
+        
+        
+        message += "\n The game is now over!"
+        let alert: UIAlertController = UIAlertController(title: message,
+                                                         message: "\n\n\n", preferredStyle: .Alert)
+        alert.modalInPopover = true;
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (action) in }))
+        self.viewController!.presentViewController(alert, animated: true, completion: nil)
+        
+    }
+    
+    
+    
+    func playMove() {
+        let scoreBefore = currentPlayer!.score
+        gameboardModel.playMove(currentPlayer!)
+        print("currentPlayer #of tiles \(currentPlayer?.tiles.count)")
+
+        if scoreBefore == currentPlayer!.score {
+            provideFeedback("Invalid move. Please try again")
+        }
+        else if gameboardModel.gameIsOver() {
+            endGame()
+        }
+        else {
+            provideFeedback("Good word! that was \(currentPlayer!.score - scoreBefore) points")
+            changeTurns()
+        }
+
+        
+        
+    }
     
 
     
@@ -427,7 +531,6 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         //we check the xIndex and yIndex, and see if the position is on the scrabble board
         let xIndex = getXIndex(curPoint)
         let yIndex = getYIndex(curPoint)
-        print("xIndex = \(xIndex), yIndex = \(yIndex)")
         if xIndex >= 0 && yIndex >= 0 && xIndex < gameboardSize && yIndex < gameboardSize {
             return (gameboardView[yIndex][xIndex], gameboardModel.gameboard[yIndex][xIndex])
         }
@@ -461,7 +564,6 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
      */
     func placeOntoTilerack(curPoint : CGPoint) -> TileRackPositionSpriteNode? {
         let xIndex = Int(floor( ((curPoint.x - startX()) / (endX() - startX())) * CGFloat(numTiles)))
-        print("xIndex of tile rack = \(xIndex)")
         if xIndex >= 0 && xIndex < Int(numTiles) && !tileRack[xIndex].isFilled() {
             return tileRack[xIndex]
         }
@@ -475,66 +577,125 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     
-//    func askForBlankTile(curTileSpriteNode : TileSpriteNode) -> TileSpriteNode {
-//        let alert: UIAlertController = UIAlertController(title: "Blank Letter",
-//                                                         message: "Choose a letter", preferredStyle: .Alert)
-//
-////        alert.modalInPopover = true;
-////        
-////        //  Create a frame (placeholder/wrapper) for the picker and then create the picker
-////        var pickerFrame: CGRect = CGRectMake(17, 52, 270, 100); // CGRectMake(left), top, width, height) - left and top are like margins
-////        var picker: UIPickerView = UIPickerView(frame: pickerFrame);
-////        
-////        //  set the pickers datasource and delegate
-////        picker.delegate = self;
-////        picker.dataSource = self;
-////        
-////        //  Add the picker to the alert controller
-////        alert.view.addSubview(picker);
-//        
-//        
-//        //2. Add the text field. You can configure it however you need.
-//        alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
-//            textField.accessibilityHint = "a, b, c, etc."
-//        })
-//        
-//        var word = ""
-//        //3. Grab the value from the text field, and print it when the user clicks OK.
-//        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (action) -> Void in
-//            let textField = alert.textFields![0] as UITextField
+    func askForBlankTile(curTileSpriteNode : TileSpriteNode, modelSquare : NormalSquare) -> TileSpriteNode {
+        if curTileSpriteNode.tile.letter != "_" {
+            return curTileSpriteNode
+        }
+        let alert: UIAlertController = UIAlertController(title: "Blank Letter",
+                                                         message: "\n\n\n\n", preferredStyle: .Alert)
+        alert.modalInPopover = true;
+        
+        //  Create a frame (placeholder/wrapper) for the picker and then create the picker
+        var pickerFrame: CGRect = CGRectMake(17, 52, 270, 100); // CGRectMake(left), top, width, height) - left and top are like margins
+        var picker: UIPickerView = UIPickerView(frame: pickerFrame);
+        
+        //  set the pickers datasource and delegate
+        picker.delegate = self;
+        picker.dataSource = self;
+        
+        //  Add the picker to the alert controller
+        alert.view.addSubview(picker);
+        
+        
+        //2. Add the text field. You can configure it however you need.
+        //3. Grab the value from the text field, and print it when the user clicks OK.
+        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (action) -> Void in
 //            word = textField.text!.uppercaseString
-//            if word.characters.count == 1 {
-//                curTileSpriteNode.texture = SKTexture(imageNamed: "square_" + word)
-//                curTileSpriteNode.letter = word.characters.first
-//            }
-//            print("Text field: \(textField.text)")
-//        }))
-//        
-//        self.viewController!.presentViewController(alert, animated: true, completion: nil)
-//        
-//
-//        
-//        return curTileSpriteNode
-//    }
-//
+            print("selected row = \(picker.selectedRowInComponent(0))")
+            let word = String(TileDictionary.getDictionary()[picker.selectedRowInComponent(0)]).uppercaseString
+            
+            if word.characters.count == 1 {
+                curTileSpriteNode.texture = SKTexture(imageNamed: "square_" + word)
+                curTileSpriteNode.OnBoardOnTileRack = .Board
+                
+                curTileSpriteNode.tile = Tile(curLet: word.characters.first!)
+                self.currentPlayer!.replaceBlankTile(modelSquare.col, row: modelSquare.row, tile: curTileSpriteNode.tile)
+                modelSquare.clearSquare()
+                modelSquare.setTile(curTileSpriteNode.tile)
+                print("curTileSpriteNode.tile = \(curTileSpriteNode.tile.letter)")
+            }
+        }))
+        
+        self.viewController!.presentViewController(alert, animated: true, completion: nil)
+        
+
+        
+        return curTileSpriteNode
+    }
+
     
     
+  
+    /**
+     Given a click, the current node that is clicked on will open
+     up the board square that it was previously on. 
+     */
+    func openUpBoardSquare(node : TileSpriteNode) {
+        originalPosition = node.position
+        node.size = tileSquareSize()
+        node.zPosition = CGFloat(2)
+        curMovingNode = node
+        if node.tile.col != nil &&  node.tile.row != nil {
+                let column = node.tile.col!
+                let row = node.tile.row!
+//                print("previous row and column (\(row), \(column))")
+                gameboardModel.gameboard[row][column].clearSquare()
+        }
+        else {
+            print("Previous column does not exist")
+        }
+    }
+    
+    /**
+     Given a click, the current node that is clicked on will open
+     up the tile rack position that it was previously on.
+     */
+    func openUpTileRackPosition(node : TileSpriteNode) {
+        if let positionOnRack = node.tile.positionOnRack {
+            tileRack[positionOnRack].state = .Empty
+            node.tile.positionOnRack = nil
+        }
+    }
+    
+    
+    
+    /**
+     This will set the current node that is clicked on will set
+     the node on the tile rack position.
+     //TODO: Put onto the tile rack using the tilePlacement instance variable
+     //TODO: 1. Check previous board position, set that in the model to ".Empty"
+     //todo: 2. Reset the TileSpriteNode.tile col, row, and placement.
+     //TODO: 3. Find the empty tile rack position, and place the square there.
+     */
+    func setNodeOntoTileRackPosition(node : TileSpriteNode) {
+        for (ndx, each) in tileRack.enumerate() {
+            if !each.isFilled() {
+                node.size = tileSquareSize()
+                node.tile.positionOnRack = ndx
+                openUpBoardSquare(node)
+                node.tile.row = nil
+                node.tile.col = nil
+                node.tile.onBoardOrTileRack = .TileRack
+                node.position = each.position
+                each.setFilled(.Filled)
+                break
+            }
+        }
+    }
     
     //if we touch a player's tiles, then we want to store that tiles
     //original position in case we couldn't place it where it is suposed to be
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        //this stores where the node was originally touched
-        print("Touches began")
-        
-        let previousPoint:CGPoint! = touches.first?.locationInNode(self)
-        let touchedNode = self.nodeAtPoint(previousPoint) as? TileSpriteNode
-        //
-        if touchedNode != nil {
-            print("Touchd node is not nil")
-            if curPlayersTiles.contains(touchedNode!) {
-                originalPosition = touchedNode!.position
-                touchedNode!.zPosition = CGFloat(2)
-                curMovingNode = touchedNode
+        if !gameIsOver {
+            //this stores where the node was originally touched
+            let previousPoint:CGPoint! = touches.first?.locationInNode(self)
+            let touchedNode = self.nodeAtPoint(previousPoint) as? TileSpriteNode
+            if touchedNode != nil {
+                let node = touchedNode!
+                if curPlayersTiles.contains(node) {
+                    openUpBoardSquare(node) // This will
+                    openUpTileRackPosition(node) //this will open up the spot on the tile rack
+                }
             }
         }
     }
@@ -544,19 +705,36 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
      This function gets called anytime a touch moves.
      */
     override func touchesMoved(touches: Set<UITouch>,withEvent event: UIEvent?) {
-        let currentPoint:CGPoint! = touches.first?.locationInNode(self)
-        let previousPoint:CGPoint! = touches.first?.previousLocationInNode(self)
-        
-        let touchedNode = self.nodeAtPoint(previousPoint) as? TileSpriteNode
-        
-        if touchedNode != nil && curPlayersTiles.contains(touchedNode!) {
-            curMovingNode = touchedNode
-            curMovingNode?.zPosition = 2
-            deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
+        if !gameIsOver {
+            let currentPoint:CGPoint! = touches.first?.locationInNode(self)
+            let previousPoint:CGPoint! = touches.first?.previousLocationInNode(self)
+            let touchedNode = self.nodeAtPoint(previousPoint) as? TileSpriteNode
+            if currentPoint.y <= startY() {
+                if touchedNode != nil && curPlayersTiles.contains(touchedNode!) {
+                    curMovingNode = touchedNode
+                    curMovingNode?.zPosition = 5
+                    deltaPoint = CGPointMake(currentPoint.x - previousPoint.x, currentPoint.y - previousPoint.y)
+                }
+                else {
+                    curMovingNode = nil
+                    deltaPoint = CGPointZero
+                }
+            }
         }
-        else {
-            curMovingNode = nil
-            deltaPoint = CGPointZero
+    }
+    
+    func isOnTileRack(curNode : TileSpriteNode) -> Bool {
+        return curNode.tile.row == nil || curNode.tile.col == nil
+    }
+    
+    
+    func setToPreviousBoardPosition(curNode : TileSpriteNode) {
+        if let curRow = curNode.tile.row {
+            if let curCol = curNode.tile.col {
+                gameboardModel.gameboard[curRow][curCol].setTile(curNode.tile)
+                curNode.position = gameboardView[curRow][curCol].position
+                curNode.size = boardSquareSize()
+            }
         }
     }
     
@@ -566,85 +744,46 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
     tie in the front-end to that backend.
     */
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let curNode = curMovingNode {
-//            whereever the center of the tile is, not the bottom left corner
-            let xOffset = CGFloat(boardSquareWidth()) * 0.50
-            let yOffset = CGFloat(boardSquareWidth()) * 0.50
+        if !gameIsOver {
+            if let curNode = curMovingNode {
+    //            whereever the center of the tile is, not the bottom left corner
+                let xOffset = CGFloat(boardSquareWidth()) * 0.50
+                let yOffset = CGFloat(boardSquareWidth()) * 0.50
 
-//            //this is the intuitive position of the dragged tile
-            var newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x + xOffset, curNode.position.y + self.deltaPoint.y - yOffset)
+                //this is the intuitive position of the dragged tile
+                let newPoint = CGPointMake(curNode.position.x + self.deltaPoint.x + xOffset,
+                                           curNode.position.y + self.deltaPoint.y - yOffset)
+                let curBoardSquare = getBoardSquare(newPoint)
+                //The tile is being dragged onto the tile rack.
+                //This means we should just find the open spot on the tile rack, and drop it there.
+                if curBoardSquare.0 == nil {
+                    setNodeOntoTileRackPosition(curNode)
+                }
+                else {
+                    let viewSquare = curBoardSquare.0!
+                    let modelSquare = curBoardSquare.1!
+                    //that means we want to put the tile in the empty spot
+                    if modelSquare.isEmpty() {
+                        askForBlankTile(curNode, modelSquare: modelSquare)
+                        modelSquare.setTile(curNode.tile)
+                        modelSquare.printSquare()
+                        curNode.size = boardSquareSize()
+                        curNode.position = viewSquare.position//Put the tile onto the viewSquare
+                    }
+                    //if the previous position was on the tile rack, we put it there.
+                    else if isOnTileRack(curNode) {
+                        setNodeOntoTileRackPosition(curNode)
+                    }
+                    //else we put it back onto the previous gameboard position.
+                    else {
+                        setToPreviousBoardPosition(curNode)
+                    }
+                }
+                curMovingNode = nil
+                curNode.zPosition = 1
+
             
-            let curBoardSquare = getBoardSquare(newPoint)
-
-            //The tile is being dragged onto the tile. This means we should just find the open
-            //spot on the tile rack, and drop it there.
-            if curBoardSquare.0 == nil {
-                //TODO: Put onto the tile rack using the tilePlacement instance variable
-                //TODO: 1. Check previous board position, set that in the model to ".Empty"
-                //todo: 2. Reset the TileSpriteNode.tile col, row, and placement.
-                //TODO: 3. Find the empty tile rack position, and place the square there.
             }
-            //this means it is on the gameboard.
-            else {
-                let viewSquare = curBoardSquare.0!
-                let modelSquare = curBoardSquare.1!
-                //Put the tile onto the square
-                curNode.position = viewSquare.position
-                modelSquare.setTile(curNode.tile)
-            }
-//                if !(curBoardSquare!.isFilled()) {
-//                    newPoint.x = curBoardSquare!.initX
-//                    newPoint.y = curBoardSquare!.initY
-//
-//                    setBoardToMatchTile(curNode, state: .Empty)
-//                    let tileNode = placeTileOntoBoard(curBoardSquare, tileNode: curNode)
-//                    setBoardToMatchTile(tileNode, state: .Placed)
-//                    curNode.OnBoardOnTileRack = .Board
-//                    if curBoardSquare?.getLetter()! == "_" {
-//                        print("is an empty square")
-//                        askForBlankTile(curNode)
-//                    }
-//                    
-//                    //this is for the logic portion
-//                    print("col = \(curBoardSquare!.colIndex), row = \(curBoardSquare!.rowIndex) ")
-//                }
-//                else {
-//                    setBoardToMatchTile(curNode, state: .Placed)
-//                    newPoint = originalPosition!
-//                    print("cannot be placed there")
-//                }
-//            }
-//            else  {
-//
-//                print("Tile's previous tile rack position... \(curNode.tilePosition!)" )
-//                //first reset the previous position to empty
-//                setTileRackState(curNode, state: .Empty)
-//                setBoardToMatchTile(curNode, state: .Empty)
-//
-//                //then drop the tile onto a valid location
-//                if let tileRackSpot = placeOntoTilerack(newPoint) {
-//                    print("Should place onto tile rack at \(tileRackSpot.position)")
-//                    newPoint = tileRackSpot.position
-//                    print("curNode position =  \(curNode.position)")
-//                    curNode.size = tileSquareSize()
-//                    curNode.putOntoTileRack(tileRackSpot.getCol()!)
-//                    tileRackSpot.setFilled(.Filled)
-//                    //check if they dropped it onto the tile
-//                }
-//            }
-//            
-//            //whereever the newPoint is set, the curNode move to tat spot
-//            curNode.position = newPoint
-//            print("Node is currently on \(curNode.OnBoardOnTileRack)")
-//            deltaPoint = CGPointZero
-//            curMovingNode?.zPosition = 1
-//            curMovingNode = nil
-//            originalPosition = nil
-//            
-//        }
-//        deltaPoint = CGPointZero
-//        curMovingNode = nil
-        
         }
     }
     
@@ -653,10 +792,12 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
      */
     override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
         print("touch cancelled")
-        deltaPoint = CGPointZero
-        curMovingNode?.position = originalPosition!
-        originalPosition = nil
-        curMovingNode = nil
+        if !gameIsOver {
+            deltaPoint = CGPointZero
+            curMovingNode?.position = originalPosition!
+            originalPosition = nil
+            curMovingNode = nil
+        }
     }
     
     

@@ -51,6 +51,7 @@ class TileDictionary {
         numOfEachLetter["Z"] =  1
         numOfEachLetter["_"] =  2 //put back to 2
         
+
         return numOfEachLetter
     }
 
