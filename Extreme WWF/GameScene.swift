@@ -255,8 +255,9 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     
-    func updateImageScore(scoreLabel: SKLabelNode, player: Player) {
+    func updateImageScore(scoreLabel: SKLabelNode, player: Player, color : SKColor) {
         scoreLabel.text = "Player \(player.playerNumber) Score: \(player.score)"
+        scoreLabel.fontColor = color
     }
     
     func drawScoreForPlayer(player : Player, minX: CGFloat, minY : CGFloat) {
@@ -281,7 +282,7 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         player1ScoreLabel.fontSize = CGFloat(20.0)
         player1ScoreLabel.fontColor = SKColor.whiteColor()
         player1ScoreLabel.zPosition = 4
-        updateImageScore(player1ScoreLabel, player: player1)
+        updateImageScore(player1ScoreLabel, player: player1, color: SKColor.whiteColor())
 
         
         player2ScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -289,7 +290,7 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         player2ScoreLabel.fontSize = CGFloat(20.0)
         player2ScoreLabel.fontColor = SKColor.whiteColor()
         player2ScoreLabel.zPosition = 4
-        updateImageScore(player2ScoreLabel, player: player2)
+        updateImageScore(player2ScoreLabel, player: player2, color: SKColor.grayColor())
 
         
         self.addChild(player1ScoreLabel)
@@ -401,14 +402,17 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         let playerNumber =  currentPlayer!.playerNumber
         hideNonPlayedTiles(curPlayersTiles)
         if playerNumber == player1.playerNumber {
-            updateImageScore(player1ScoreLabel, player: currentPlayer!)
+            updateImageScore(player1ScoreLabel, player: currentPlayer!, color: SKColor.grayColor())
             currentPlayer = player2
+            updateImageScore(player2ScoreLabel, player: currentPlayer!, color: SKColor.whiteColor())
         }
         else if playerNumber == player2.playerNumber {
-            updateImageScore(player2ScoreLabel, player: currentPlayer!)
+            updateImageScore(player2ScoreLabel, player: currentPlayer!, color: SKColor.grayColor())
             currentPlayer = player1
+            updateImageScore(player1ScoreLabel, player: currentPlayer!, color: SKColor.whiteColor())
             
         }
+        
         curPlayersTiles = initPlayersTiles(currentPlayer!)
     }
     
