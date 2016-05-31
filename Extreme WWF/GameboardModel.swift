@@ -239,10 +239,16 @@ class GameboardModel {
      */
     func isValidMove(tiles : Array<Tile>) -> Bool {
         var activeTilePlacements = Array<(row: Int, col: Int)>()
+        var isValid = false
         for each in tiles {
             if let row = each.row {
                 if let col = each.col {
                     activeTilePlacements.append((row: row, col : col))
+                    if isFirstMove {
+                        if row == 7 && col == 7 {
+                            isValid = true
+                        }
+                    }
                 }
             }
         }
@@ -257,6 +263,9 @@ class GameboardModel {
                 print("\(key) is This is not a valid spelling")
                 return false
             }
+        }
+        if isValid {
+            isFirstMove = false
         }
         return verticalStraight || horizontalStraight
         

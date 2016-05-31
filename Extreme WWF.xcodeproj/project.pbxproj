@@ -14,7 +14,6 @@
 		204D14A11C92772800903B37 /* SquarePlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204D14A01C92772800903B37 /* SquarePlacement.swift */; };
 		205091711C5EDB9300FC18C0 /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091701C5EDB9300FC18C0 /* Tile.swift */; };
 		205091771C5EDD4500FC18C0 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091761C5EDD4500FC18C0 /* Player.swift */; };
-		205091791C5EDE5300FC18C0 /* Scoreboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205091781C5EDE5300FC18C0 /* Scoreboard.swift */; };
 		205BF4221C9CC3CC00D63CAF /* SquareState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205BF4211C9CC3CC00D63CAF /* SquareState.swift */; };
 		20608DEF1C5DCC6800E01D12 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */; };
 		20608DF31C5DCC6800E01D12 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20608DF21C5DCC6800E01D12 /* GameScene.swift */; };
@@ -53,7 +52,6 @@
 		204D14A01C92772800903B37 /* SquarePlacement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquarePlacement.swift; sourceTree = "<group>"; };
 		205091701C5EDB9300FC18C0 /* Tile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		205091761C5EDD4500FC18C0 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
-		205091781C5EDE5300FC18C0 /* Scoreboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scoreboard.swift; sourceTree = "<group>"; };
 		205BF4211C9CC3CC00D63CAF /* SquareState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquareState.swift; sourceTree = "<group>"; };
 		20608DEB1C5DCC6800E01D12 /* Extreme WWF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Extreme WWF.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20608DEE1C5DCC6800E01D12 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -142,7 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				20608E131C5DD27800E01D12 /* GameboardModel.swift */,
-				205091781C5EDE5300FC18C0 /* Scoreboard.swift */,
 			);
 			name = Gameboard;
 			sourceTree = "<group>";
@@ -349,7 +346,6 @@
 				20B6F3C71C6530D2007A0E72 /* TileCollection.swift in Sources */,
 				205091771C5EDD4500FC18C0 /* Player.swift in Sources */,
 				20AFB8241CD3F4B700B2F55B /* BoardOrTileRack.swift in Sources */,
-				205091791C5EDE5300FC18C0 /* Scoreboard.swift in Sources */,
 				20608DEF1C5DCC6800E01D12 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

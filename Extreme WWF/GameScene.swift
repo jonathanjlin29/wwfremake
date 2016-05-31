@@ -120,21 +120,23 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
      */
     override func didMoveToView(view: SKView) {
         print("Did move to view")
-        gameboardModel = GameboardModel(GameboardSize: 15, tileCollection: TileCollection())
-        currentPlayer = player1
         initGame()
-        initDrawBoard()
-        curPlayersTiles = initPlayersTiles(player1)
-        drawScoreForPlayer(player1, minX: CGFloat(0), minY : startY() + boardSquareWidth())
     }
     
-
     func initGame() {
+        self.removeAllChildren()
+        gameIsOver = false
+        self.skipCounter = 0
+        gameboardModel = GameboardModel(GameboardSize: 15, tileCollection: TileCollection())
+        currentPlayer = player1
         player1 = gameboardModel.getPlayer()
         player2 = gameboardModel.getPlayer()
         gameboardModel.addPlayerToGame(player1)
         gameboardModel.addPlayerToGame(player2)
         currentPlayer = player1
+        initDrawBoard()
+        curPlayersTiles = initPlayersTiles(player1)
+        drawScoreForPlayer(player1, minX: CGFloat(0), minY : startY() + boardSquareWidth())
     }
 //
 //    /**
@@ -394,26 +396,52 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
         }
         var tiles = playersTiles
         tiles.removeAll()
-
         
     }
     
     func changeTurns() {
-        let playerNumber =  currentPlayer!.playerNumber
-        hideNonPlayedTiles(curPlayersTiles)
-        if playerNumber == player1.playerNumber {
-            updateImageScore(player1ScoreLabel, player: currentPlayer!, color: SKColor.grayColor())
-            currentPlayer = player2
-            updateImageScore(player2ScoreLabel, player: currentPlayer!, color: SKColor.whiteColor())
+        let playerNumber =  self.currentPlayer!.playerNumber
+        self.hideNonPlayedTiles(self.curPlayersTiles)
+        if playerNumber == self.player1.playerNumber {
+            self.updateImageScore(self.player1ScoreLabel, player: self.currentPlayer!, color: SKColor.grayColor())
+            self.currentPlayer = self.player2
+            self.updateImageScore(self.player2ScoreLabel, player: self.currentPlayer!, color: SKColor.whiteColor())
         }
-        else if playerNumber == player2.playerNumber {
-            updateImageScore(player2ScoreLabel, player: currentPlayer!, color: SKColor.grayColor())
-            currentPlayer = player1
-            updateImageScore(player1ScoreLabel, player: currentPlayer!, color: SKColor.whiteColor())
+        else if playerNumber == self.player2.playerNumber {
+            self.updateImageScore(self.player2ScoreLabel, player: self.currentPlayer!, color: SKColor.grayColor())
+            self.currentPlayer = self.player1
+            self.updateImageScore(self.player1ScoreLabel, player: self.currentPlayer!, color: SKColor.whiteColor())
             
         }
-        
-        curPlayersTiles = initPlayersTiles(currentPlayer!)
+        self.curPlayersTiles = self.initPlayersTiles(self.currentPlayer!)
+    }
+    
+    func changeTurns(scoreBefore : Int) {
+        let message = "Good word! that was \(currentPlayer!.score - scoreBefore) points." +
+            "Please give the phone to the next player."
+        let title = "Play Move"
+        let okText = "OK"
+        let alert = UIAlertController(title: title, message: message,
+                                      preferredStyle: UIAlertControllerStyle.Alert)
+        self.hideNonPlayedTiles(self.curPlayersTiles)
+        let okButton = UIAlertAction(title: okText, style: .Cancel, handler: { (alert: UIAlertAction!) in
+            let playerNumber =  self.currentPlayer!.playerNumber
+            if playerNumber == self.player1.playerNumber {
+                self.updateImageScore(self.player1ScoreLabel, player: self.currentPlayer!, color: SKColor.grayColor())
+                self.currentPlayer = self.player2
+                self.updateImageScore(self.player2ScoreLabel, player: self.currentPlayer!, color: SKColor.whiteColor())
+            }
+            else if playerNumber == self.player2.playerNumber {
+                self.updateImageScore(self.player2ScoreLabel, player: self.currentPlayer!, color: SKColor.grayColor())
+                self.currentPlayer = self.player1
+                self.updateImageScore(self.player1ScoreLabel, player: self.currentPlayer!, color: SKColor.whiteColor())
+                
+            }
+            self.curPlayersTiles = self.initPlayersTiles(self.currentPlayer!)
+        })
+        alert.addAction(okButton)
+        self.viewController!.presentViewController(alert, animated: true, completion: nil)
+
     }
     
     
@@ -450,7 +478,9 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
                                                          message: "\n\n\n", preferredStyle: .Alert)
         alert.modalInPopover = true;
         
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (action) in }))
+        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (action) in
+            self.initGame()
+        }))
         self.viewController!.presentViewController(alert, animated: true, completion: nil)
         
     }
@@ -469,8 +499,7 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
             endGame()
         }
         else {
-            provideFeedback("Good word! that was \(currentPlayer!.score - scoreBefore) points")
-            changeTurns()
+            changeTurns(scoreBefore)
         }
 
         
@@ -490,14 +519,6 @@ class GameScene: SKScene, UIPickerViewDataSource, UIPickerViewDelegate {
             }
         }
     }
-    
-    /**
-     Switch the player's tiles.
-     */
-    func switchPlayersTiles() {
-        
-    }
-
     
     /**
      This will return the xIndex of the board given a point on the board.
